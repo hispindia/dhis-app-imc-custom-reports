@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Pratt - Free Bootstrap 3 Theme">
+    <meta name="author" content="Alvarez.is - BlackTie.co">
+    <link rel="shortcut icon" href="assets/ico/favicon.png">
+
+    <title>Dhis2QuIC</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="assets/css/main.css" rel="stylesheet">
+    <!--
+    <link href="assets/css/tag-basic-style.css" rel="stylesheet">
+    -->
+
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet'
+          type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,700' rel='stylesheet' type='text/css'>
+
+    <script src="assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/js/md5.js"></script>
+    <script type="text/javascript" src="assets/js/digestAuthRequest.js"></script>
+    <script src="assets/js/config.js"></script>
+
+</head>
+
+<body id="pageBody">
+
+<div id="navigation" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#"><b>Dhis2QuIC</b></a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="config.html" class="smoothScroll">
+                    Configuration
+                    <span class="glyphicon glyphicon-adjust"></span>
+                </a></li>
+                <li><a href="import.html" class="smoothScroll">
+                    Import
+                    <span class="glyphicon glyphicon-import"></span>
+                </a></li>
+                <li><a href="#contact" class="smoothScroll">
+                    Outputs
+                    <span class="glyphicon glyphicon-print"></span>
+                </a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<section id="home" name="home"></section>
+
+<div class="container" id="page">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="container">
+                <div class="row">
+                    <form role="form" id="configForm">
+
+                        <div class="form-group">
+                            <label for="instance_id">Server ID</label>
+                            <input type="text" class="form-control" id="instance_id" placeholder="Server ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="url">Instance URL</label>
+                            <input type="url" class="form-control" id="url" placeholder="URL">
+                        </div>
+                        <div class="form-group">
+                            <label for="user">User Name</label>
+                            <input type="text" class="form-control" id="user" placeholder="Username">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" placeholder="Password">
+                        </div>
+
+                        <button type="submit" class="btn btn-default" id="importButton">Save</button>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8"></div>
+    </div>
+</div>
+
+</body>
+
+</html>
