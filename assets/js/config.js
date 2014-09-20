@@ -2,7 +2,7 @@
  * Created by gaurav on 12/9/14.
  */
 
-if (!jQuery) { throw new Error("Bootstrap requires jQuery") }
+if (!jQuery) { throw new Error("Bootstrap requires jQuery") };
 
 
 var getFormData =  function (commCareFormURL, commCareUserID, commCarePassword){
@@ -15,7 +15,7 @@ var getFormData =  function (commCareFormURL, commCareUserID, commCarePassword){
     },function(errorCode) {
         console.log('no dice: '+errorCode)
     });
-}
+};
 
 $(document).ready(function () {
 

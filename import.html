@@ -18,17 +18,18 @@
     <!-- Custom styles for this template -->
     <link href="assets/css/main.css" rel="stylesheet">
 
-    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet'
+          type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,700' rel='stylesheet' type='text/css'>
 
 
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/smoothscroll.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap.js"></script>
     <script type="text/javascript" src="assets/js/md5.js"></script>
     <script type="text/javascript" src="assets/js/digestAuthRequest.js"></script>
-    <script type="text/javascript" src="assets/js/lodash.js"/>
-    <script type="text/javascript" src="assets/js/sensei-grid.js"/>
-    <script src="assets/js/config.js"></script>
+    <script type="text/javascript" src="assets/js/lodash.js"></script>
+    <script type="text/javascript" src="assets/js/sensei-grid.js"></script>
+    <script type="text/javascript" src="assets/js/import.js"></script>
 
 
 </head>
@@ -48,38 +49,54 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li ><a href="config.html" class="smoothScroll">
+                <li><a href="config.html" class="smoothScroll">
                     Configuration
-                    <span class="glyphicon glyphicon-adjust"></span>
                 </a></li>
                 <li class="active"><a href="import.html" class="smoothScroll">
                     Import
-                    <span class="glyphicon glyphicon-import"></span>
                 </a></li>
                 <li><a href="#contact" class="smoothScroll">
                     Outputs
-                    <span class="glyphicon glyphicon-print"></span>
                 </a></li>
             </ul>
-        </div><!--/.nav-collapse -->
+        </div>
+        <!--/.nav-collapse -->
     </div>
 </div>
 
-
-<section id="home" name="home"></section>
 
 <div class="container" id="page">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="container">
-                <div class="row">
-                   <div class="mapGrid"></div>
-                </div>
-            </div>
+
+    <div class="row" id="alertDiv" style="display: none">
+        <div class="alert alert-info fade in" role="alert" id="alertContent">
+            <button class="close" data-dismiss="alert" type="button"></button>
         </div>
-        <div class="col-md-8"></div>
+    </div>
+
+    <div class="row" id="deList" style="display: none">
+        <div class="panel panel-default">
+            <div class="panel-heading" style="font-weight: bold">New Items</div>
+            <table class="table" title="New Items" id="mappingTable">
+                <tr style="font-weight: bold">
+                    <th>CommCare ID</th>
+                    <th>Type</th>
+                    <th>Dataelement Name</th>
+                </tr>
+                <tr>
+                    <td>demo_abc</td>
+                    <td>Boolean</td>
+                    <td><input type="text" class="input-sm"></td>
+                </tr>
+            </table>
+        </div>
+
+        <button class="btn btn-default">Import</button>
+
+    </div>
+    <div class="row">
     </div>
 </div>
+
 
 </body>
 </html>

@@ -143,3 +143,7 @@ a:after {
     font-weight: bold;
 }
 
+#mappingTable {
+    background-color: ghostwhite;
+}
+
