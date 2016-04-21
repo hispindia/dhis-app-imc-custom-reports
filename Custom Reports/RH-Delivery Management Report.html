@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="IMC Custom Reporting App">
+<meta name="author" content="Gaurav<gaurav08021@gmail.com>">
+<link rel="shortcut icon" href="assets/ico/favicon.png">
+
+<title>Custom Reports</title>
+<!-- Bootstrap core CSS -->
+<link href="assets/css/bootstrap.css" rel="stylesheet">
+<!-- Jasny Bootstrap-Extension CSS -->
+<link href="assets/css/jasny-bootstrap.css" rel="stylesheet">
+<link href="assets/css/bootstrap-select.css" rel="stylesheet">
+<link href="assets/css/bootstrap-datetimepicker.css" rel="stylesheet">
+<!-- Custom styles for this template -->
+<link href="assets/css/main.css" rel="stylesheet">
+<link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet'
+      type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Raleway:400,300,700' rel='stylesheet' type='text/css'>
+<link href='assets/css/bordered.css' rel='stylesheet' type='text/css'>
+
+
+<script type="text/javascript" src="assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="assets/js/bootstrap.js"></script>
+<script type="text/javascript" src="assets/js/jasny-bootstrap.js"></script>
+<script type="text/javascript" src="assets/js/bootstrap-select.js"></script>
+<script type="text/javascript" src="assets/js/moment.js"></script>
+<script type="text/javascript" src="assets/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="assets/js/exportExcel.js"></script>
+<script type="text/javascript" src="assets/js/reportValues.js"></script>
+
+<script type="application/javascript">
+    var dhisBaseURL='';
+
+
+    var reportLogic = function () {
+
+        //--------Get all parameters from session memory------//
+        dhisBaseURL = sessionStorage.getItem('dhisBaseURL');
+        var orgUnitName = sessionStorage.getItem('orgUnitName');
+        var startDate = sessionStorage.getItem('startDate');
+        var endDate = sessionStorage.getItem('endDate');
+        var donorName = sessionStorage.getItem('donorName');
+        var impName = sessionStorage.getItem('impName');
+        var orgUnitGroupName = sessionStorage.getItem('orgUnitGroupName');
+        var orgUnitLevelName = sessionStorage.getItem('orgUnitLevelName');
+        var donorCode = sessionStorage.getItem('donorCode');
+        var impCode = sessionStorage.getItem('impCode');
+        var orgUnitGroupCode = sessionStorage.getItem('orgUnitGroupCode');
+        var orgUnitLevelCode = sessionStorage.getItem('orgUnitLevelCode');
+        var orgUnitCode = sessionStorage.getItem('orgUnitCode');
+        var periodList = sessionStorage.getItem('periodList');
+        //-----------------------------------------------------//
+
+
+        var analyticsURL = dhisBaseURL+'/analytics?' + '&dimension=pe:' + periodList;
+
+        console.log(donorCode);
+        console.log(impCode);
+        console.log(orgUnitGroupCode);
+        console.log(orgUnitLevelCode);
+        console.log(orgUnitCode);
+        console.log(donorCode);
+        console.log(startDate);
+        console.log(endDate);
+        console.log(donorName);
+        console.log(impName);
+
+        if (orgUnitCode != "") {
+            $('#reportTags').append('<div class="row"></row><label>Org. Unit Name: ' + orgUnitName + '</label></div>');
+            analyticsURL = analyticsURL.concat('&filter=ou:' + orgUnitCode);
+        }
+        else if (orgUnitGroupCode != "") {
+            $('#reportTags').append('<div class="row"><label>Org. Unit Group: ' + orgUnitGroupName + '</label></div>');
+            analyticsURL = analyticsURL.concat('&filter=ou:OU_GROUP-' + orgUnitGroupCode);
+        }
+        else {
+            $('#reportTags').append('<div class="row"><label>Org. Unit Level: ' + orgUnitLevelName + '</label></div>');
+            analyticsURL = analyticsURL.concat('&filter=ou:LEVEL-6');
+        }
+
+        $('#reportTags').append('<div class="row"><label>' + startDate + ' to ' + endDate + '</label></div>');
+        if (donorCode != "") {
+            $('#reportTags').append('<div class="row"><label>Donor: ' + donorName + '</label></div>');
+            analyticsURL = analyticsURL.concat('&filter=Q3QQy1PWrqe:' + donorCode);
+        }
+        if (impCode != "") {
+            $('#reportTags').append('<div class="row"><label>Implementation Partner: ' + impName + '</label></div>');
+            analyticsURL = analyticsURL.concat('&filter=XkPfFUjhEui:' + impCode);   }
+
+
+
+
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:lAGXLfKDej0','#SBA');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:JABmrOFKRtd','#OtherSBA');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:ncxUixANv9N','#NDC');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:fLVZXggV65S','#Caesarian');
+        getMappedFormulaValue(analyticsURL,'[&dimension=dx:lAGXLfKDej0]+[&dimension=dx:JABmrOFKRtd]+[&dimension=dx:ncxUixANv9N]+[&dimension=dx:fLVZXggV65S]','#TotalDeliveries');
+
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:ekWHLmwJE7x','#Stillbirth');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:m8NIQ6RREOK','#Livebirth');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:N3p9uhIS1lt','#Deliveries37');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:zUQOGYRL2gw','#LowWeight');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:WdZDM5Iabb1','#SkilledCare');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:y5OWN6kA96O','#CongenitalAnomalies');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:KoL8LZHpGwR','#Abortion');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:hcjtWAQt1DW','#PAC');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:Xh3RsxKKjM6','#ReferredCases');
+
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:FjkMAJe5I06','#Obstructed');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:NeFWfs4DLnn','#Hemorrhage');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:a5NWhUJgmFi','#Infection');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:uP2VCrzJem8','#Eclampsia');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:xkXcYuQZpoR','#OtherMaternal');
+        getMappedFormulaValue(analyticsURL,'[&dimension=dx:FjkMAJe5I06]+[&dimension=dx:NeFWfs4DLnn]+[&dimension=dx:a5NWhUJgmFi]+[&dimension=dx:uP2VCrzJem8]+[&dimension=dx:xkXcYuQZpoR]','#TotalMaternal');
+
+
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:vLeWvACuMcm','#Hypothermia');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:MZ7u5Uck3XB','#Sepsis');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:SURFOPSsK4h','#Asphyxia');
+        getMappedFormulaValue(analyticsURL,'&dimension=dx:ALKVqW9bhwo','#OtherNeonatal');
+        getMappedFormulaValue(analyticsURL,'[&dimension=dx:vLeWvACuMcm]+[&dimension=dx:MZ7u5Uck3XB]+[&dimension=dx:SURFOPSsK4h]+[&dimension=dx:ALKVqW9bhwo]','#TotalNeonatal');
+
+        getMappedFormulaValue(analyticsURL,'[&dimension=dx:FjkMAJe5I06]+[&dimension=dx:NeFWfs4DLnn]+[&dimension=dx:a5NWhUJgmFi]+[&dimension=dx:uP2VCrzJem8]+[&dimension=dx:xkXcYuQZpoR]+[&dimension=dx:vLeWvACuMcm]+[&dimension=dx:MZ7u5Uck3XB]+[&dimension=dx:SURFOPSsK4h]+[&dimension=dx:ALKVqW9bhwo]','#TotalComplications');
+
+        reportNotNull=returnReportStatus();
+    }
+
+    $(document).ready(function () {
+
+        reportNotNull=false;
+        document.getElementById('noValues').style.display='none';
+        document.getElementById('reportInside').style.display='none';
+        document.getElementById('head').style.display='block';
+
+        reportLogic();
+        $("#btnExport").click(function (e) {
+            tableToExcel('tableContainer', 'RH-Delivery Management Report');
+            e.preventDefault();
+        });
+        $("#btnBack").click(function (e) {
+            reportNotNull=false;
+            window.history.go(-1);
+        });
+        $("#btnBack2").click(function (e) {
+            reportNotNull=false;
+            window.history.go(-1);
+        });
+        $("#btnHome").click(function (e) {
+            var hrefURL=dhisBaseURL.substring(0,dhisBaseURL.length-3);
+            window.location.href = hrefURL+'dhis-web-dashboard-integration/index.action';
+        });
+        $("#btnPrint").click(function (e) {
+            var headstr = "<html><head><title></title></head><body>";
+            var footstr = "</body>";
+            var reportName=document.getElementById('reportName').innerHTML;
+            var newstr = document.all.item('tableContainer').innerHTML;
+            var oldstr = document.body.innerHTML;
+            document.body.innerHTML = headstr+reportName+newstr+footstr;
+            window.print();
+            document.body.innerHTML = oldstr;
+        });
+        if(reportNotNull){
+            document.getElementById('head').style.display='none';
+            document.getElementById('reportInside').style.display='block';
+        }
+        else{
+            document.getElementById('head').style.display='none';
+            document.getElementById('noValues').style.display='block';
+        }
+
+
+    });
+
+
+</script>
+
+
+</head>
+<body id="pageBody">
+<div id="navigation" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            <img src="assets/img/news.png" width="35px" height="35px">
+                            &NonBreakingSpace;
+                            <b>[Custom-Reports]</b>
+                        </a>
+                        <label>
+                            <span class="navbar-fixed-top" id="btnHome" style="padding-left:90%; padding-top: 20px">
+                                <div class="label btn-primary">&nbsp;&nbsp;Home&nbsp;&nbsp;</div>
+                            </span>
+                        </label>
+                    </span>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav"></ul>
+        </div>
+    </div>
+</div>
+<div class="container" id="head" style="padding-top: 20%">
+    <div style="margin:auto;text-align: center">Report is Loading...</div>
+    <div class="progress progress-striped active" id="cover">
+        <div class="progress-bar progress-bar-info"
+             role="progressbar"
+             aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+             style="width: 100%;">
+        </div>
+    </div>
+</div>
+<div class="container" id="page" style="padding-top: 60px">
+
+    <div class="container" id="reportInside">
+        <div class="row">
+            <div class="col-md-8" id="reportName">
+                <label><span class="label label-primary">RH-Delivery Management Report</span></label>
+            </div>
+            <div class="col-md-2">
+                <div style="float: left"><label><span class="label btn-success" id="btnBack">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+            </div>
+            <div class="col-md-1">
+                <div style="float: right"><label><span class="label btn-success" id="btnExport">&nbsp;Export to Excel&nbsp;</span></label></div>
+            </div>
+            <div class="col-md-1">
+                <div style="float: left"><label><span class="label btn-success" id="btnPrint">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+            </div>
+        </div>
+
+
+        <div class="container">
+            <div class="col-md-12" id="tableContainer" style="padding-top: 20px">
+                <div class="col-md-6"  id="reportTags"></div>
+                <div class="col-md-6"></div>
+                <table class="bordered" id="RH-DeliveryManagementReport">
+                    <tr>
+                        <th>Service</th>
+                        <th>Number</th>
+                        <th colspan="3"></th>
+                    </tr>
+                    <tr>
+                        <td>Normal delivery in facility by Skilled Birth Attendant (SBA)</td>
+                        <td id="SBA"></td>
+                        <th colspan="3">Complications identified during labor</th>
+                    </tr>
+                    <tr>
+                        <td>Normal delivery in facility by other than Skilled Birth Attendant</td>
+                        <td id="OtherSBA"></td>
+                        <td rowspan="6">Maternal</td>
+                        <td>Obstructed</td>
+                        <td id="Obstructed"></td>
+                    </tr>
+                    <tr>
+                        <td>Normal delivery in the community</td>
+                        <td id="NDC"></td>
+                        <td>Hemorrhage</td>
+                        <td id="Hemorrhage"></td>
+                    </tr>
+                    <tr>
+                        <td>Caesarian Section</td>
+                        <td id="Caesarian"></td>
+                        <td>Infection</td>
+                        <td id="Infection"></td>
+                    </tr>
+                    <tr>
+                        <td>Total Deliveries</td>
+                        <td id="TotalDeliveries"></td>
+                        <td>Eclampsia</td>
+                        <td id="Eclampsia"></td>
+                    </tr>
+                    <tr>
+                        <td>Stillbirth</td>
+                        <td id="Stillbirth"></td>
+                        <td>Other maternal complications</td>
+                        <td id="OtherMaternal"></td>
+                    </tr>
+                    <tr>
+                        <td>Live birth</td>
+                        <td id="Livebirth"></td>
+                        <td>Total maternal complications</td>
+                        <td id="TotalMaternal"></td>
+                    </tr>
+                    <tr>
+                        <td>Deliveries with less than 37 weeks of pregnancy</td>
+                        <td id="Deliveries37"></td>
+                        <td rowspan="5">Neonatal</td>
+                        <td>Hypothermia</td>
+                        <td id="Hypothermia"></td>
+                    </tr>
+                    <tr>
+                        <td>Low birth weight babies (&lt;2500 grams)</td>
+                        <td id="LowWeight"></td>
+                        <td>Sepsis</td>
+                        <td id="Sepsis"></td>
+                    </tr>
+                    <tr>
+                        <td>Babies Has skilled care during birth</td>
+                        <td id="SkilledCare"></td>
+                        <td>Asphyxia</td>
+                        <td id="Asphyxia"></td>
+                    </tr>
+                    <tr>
+                        <td>Babies born with congenital anomalies</td>
+                        <td id="CongenitalAnomalies"></td>
+                        <td>Other neonatal complications</td>
+                        <td id="OtherNeonatal"></td>
+                    </tr>
+                    <tr>
+                        <td>Number of abortion cases</td>
+                        <td id="Abortion"></td>
+                        <td>Total neonatal complications</td>
+                        <td id="TotalNeonatal"></td>
+                    </tr>
+                    <tr>
+                        <td>Number of Post Abortion Care (PAC)</td>
+                        <td id="PAC"></td>
+                        <td colspan="2">Total complications</td>
+                        <td id="TotalComplications"></td>
+                    </tr>
+                    <tr>
+                        <td>Referred cases</td>
+                        <td id="ReferredCases"></td>
+                        <td colspan="3"></td>
+                    </tr>
+                </table>
+                <br><br>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="noValues" style="padding-top: 5%">
+    <div class="row">
+        <div class="col-md-5"></div>
+        <div class="col-md-2"> <img src="assets/img/noValues.png"> </div>
+        <div class="col-md-5"></div>
+    </div>
+    <h1 style="text-align: center">No values found. Please change report parameters.</h1><br>
+    <div class="row">
+        <div class="col-md-5"></div>
+        <div class="col-md-2">
+            <div style="float: left"><label><span class="label btn-success" id="btnBack2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+        </div>
+        <div class="col-md-5"></div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="IMC Custom Reporting App">
+    <meta name="author" content="Gaurav<gaurav08021@gmail.com>">
+    <link rel="shortcut icon" href="assets/ico/favicon.png">
+
+    <title>Custom Reports</title>
+    <!-- Bootstrap core CSS -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <!-- Jasny Bootstrap-Extension CSS -->
+    <link href="assets/css/jasny-bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-select.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-datetimepicker.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="assets/css/main.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet'
+          type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,300,700' rel='stylesheet' type='text/css'>
+    <link href='assets/css/bordered.css' rel='stylesheet' type='text/css'>
+
+
+    <script type="text/javascript" src="assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap.js"></script>
+    <script type="text/javascript" src="assets/js/jasny-bootstrap.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap-select.js"></script>
+    <script type="text/javascript" src="assets/js/moment.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="assets/js/exportExcel.js"></script>
+    <script type="text/javascript" src="assets/js/reportValues.js"></script>
+
+    <script type="text/javascript">
+    var dhisBaseURL='';
+    var morbidityNameArray=new Array();
+    morbidityNameArray[0]='Epilepsy';
+    morbidityNameArray[1]='Drug and alcohol abuse';
+    morbidityNameArray[2]='Intellectual Disability';
+    morbidityNameArray[3]='Psychotic disorders';
+    morbidityNameArray[4]='Depression';
+    morbidityNameArray[5]='Bipolar Disorder';
+    morbidityNameArray[6]='PTSD';
+    morbidityNameArray[7]='Panic Disorder';
+    morbidityNameArray[8]='GAD';
+    morbidityNameArray[9]='Unexplained somatic complaints';
+    morbidityNameArray[10]='Bereavement';
+    morbidityNameArray[11]='ASD';
+    morbidityNameArray[12]='Dissociation';
+    morbidityNameArray[13]='Enuresis';
+    morbidityNameArray[14]='Insomnia';
+    morbidityNameArray[15]='Hyperventilation';
+    morbidityNameArray[16]='Dementia';
+    morbidityNameArray[17]='ADHD';
+    morbidityNameArray[18]='CD';
+    morbidityNameArray[19]='Lower Respiratory Tract Infection';
+    morbidityNameArray[20]='Upper Respiratory Tract Infection';
+    morbidityNameArray[21]='Severe Acute respiratory illness (SARI)';
+    morbidityNameArray[22]='Tuberculosis (Susp.)';
+    morbidityNameArray[23]='Acute Watery Diarrhea (susp. Cholera)';
+    morbidityNameArray[24]='Acute Bloody Diarrhea (susp. Shigellosis)';
+    morbidityNameArray[25]='Acute Jaundice Syndrome (susp. Hepatitis)';
+    morbidityNameArray[26]='Acute Flaccid Paralysis (susp. Poliomyelitis)';
+    morbidityNameArray[27]='Measles (susp.)';
+    morbidityNameArray[28]='Meningitis (susp.)';
+    morbidityNameArray[29]='Leishmaniasis';
+    morbidityNameArray[30]='Fever of Unknown Origin (FUO)';
+    morbidityNameArray[31]='Other Diarrhea (Gastroenteritis)';
+    morbidityNameArray[32]='Irritable bowel syndrome (IBS)';
+    morbidityNameArray[33]='Peptic ulcer';
+    morbidityNameArray[34]='Dermatitis';
+    morbidityNameArray[35]='Scabies';
+    morbidityNameArray[36]='Lice';
+    morbidityNameArray[37]='Osteoarthritis';
+    morbidityNameArray[38]='Conjunctivitis';
+    morbidityNameArray[39]='Urinary Tract Infection';
+    morbidityNameArray[40]='Sexually Transmitted Infection';
+    morbidityNameArray[41]='Asthma';
+    morbidityNameArray[42]='Hypertension';
+    morbidityNameArray[43]='Myocardial ischemia';
+    morbidityNameArray[44]='Congestive heart disease';
+    morbidityNameArray[45]='Diabetes';
+    morbidityNameArray[46]='Chemical-Biological Agent (conflict)';
+    morbidityNameArray[47]='Gunshot Wound (conflict)';
+    morbidityNameArray[48]='Burn (conflict)';
+    morbidityNameArray[49]='Traumatic Amputation (conflict)';
+    morbidityNameArray[50]='Other Conflict Related Injury';
+    morbidityNameArray[51]='Non-Conflict Related Injury';
+
+    var morbidityValuesArray=new Array();
+    morbidityValuesArray[0]=0;
+    morbidityValuesArray[1]=0;
+    morbidityValuesArray[2]=0;
+    morbidityValuesArray[3]=0;
+    morbidityValuesArray[4]=0;
+    morbidityValuesArray[5]=0;
+    morbidityValuesArray[6]=0;
+    morbidityValuesArray[7]=0;
+    morbidityValuesArray[8]=0;
+    morbidityValuesArray[9]=0;
+    morbidityValuesArray[10]=0;
+    morbidityValuesArray[11]=0;
+    morbidityValuesArray[12]=0;
+    morbidityValuesArray[13]=0;
+    morbidityValuesArray[14]=0;
+    morbidityValuesArray[15]=0;
+    morbidityValuesArray[16]=0;
+    morbidityValuesArray[17]=0;
+    morbidityValuesArray[18]=0;
+    morbidityValuesArray[19]=0;
+    morbidityValuesArray[20]=0;
+    morbidityValuesArray[21]=0;
+    morbidityValuesArray[22]=0;
+    morbidityValuesArray[23]=0;
+    morbidityValuesArray[24]=0;
+    morbidityValuesArray[25]=0;
+    morbidityValuesArray[26]=0;
+    morbidityValuesArray[27]=0;
+    morbidityValuesArray[28]=0;
+    morbidityValuesArray[29]=0;
+    morbidityValuesArray[30]=0;
+    morbidityValuesArray[31]=0;
+    morbidityValuesArray[32]=0;
+    morbidityValuesArray[33]=0;
+    morbidityValuesArray[34]=0;
+    morbidityValuesArray[35]=0;
+    morbidityValuesArray[36]=0;
+    morbidityValuesArray[37]=0;
+    morbidityValuesArray[39]=0;
+    morbidityValuesArray[40]=0;
+    morbidityValuesArray[41]=0;
+    morbidityValuesArray[42]=0;
+    morbidityValuesArray[43]=0;
+    morbidityValuesArray[44]=0;
+    morbidityValuesArray[45]=0;
+    morbidityValuesArray[46]=0;
+    morbidityValuesArray[47]=0;
+    morbidityValuesArray[48]=0;
+    morbidityValuesArray[49]=0;
+    morbidityValuesArray[50]=0;
+    morbidityValuesArray[51]=0;
+
+    var morbidityFormulaArray=new Array();
+
+    morbidityFormulaArray[0]='[&dimension=dx:KBrJ0lNdFP2&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:KBrJ0lNdFP2&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:viUT3cybg93&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:viUT3cybg93&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[1]='[&dimension=dx:bB76Sqr3wXs&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:bB76Sqr3wXs&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:g8cBQWcEI64&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:g8cBQWcEI64&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[2]='[&dimension=dx:w3rYKSxBpLN&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:w3rYKSxBpLN&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:bWe6NtslFpc&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:bWe6NtslFpc&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[3]='[&dimension=dx:RcDWtbyy3SH&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:RcDWtbyy3SH&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:ITuAn529ZhV&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:ITuAn529ZhV&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[4]='[&dimension=dx:YvLAR2YfQft&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:YvLAR2YfQft&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:yAxgkkAt3kK&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:yAxgkkAt3kK&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[5]='[&dimension=dx:XuUpf1jaXwd&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:XuUpf1jaXwd&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:tck7sy9fzz7&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:tck7sy9fzz7&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[6]='[&dimension=dx:WKcjrZrYMV7&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:WKcjrZrYMV7&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:hXq4IroMyK6&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:hXq4IroMyK6&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[7]='[&dimension=dx:sQ5i4UAlDgL&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:sQ5i4UAlDgL&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:j5olW3l24aa&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:j5olW3l24aa&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[8]='[&dimension=dx:BkveQZQjoEL&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:BkveQZQjoEL&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:XBO8sG3kSX4&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:XBO8sG3kSX4&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[9]='[&dimension=dx:PmcvFuYZeLm&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:PmcvFuYZeLm&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:XH1boUyw15e&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:XH1boUyw15e&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[10]='[&dimension=dx:LsNUb3lXpQr&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:LsNUb3lXpQr&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:n9WqL2IcMBy&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:n9WqL2IcMBy&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[11]='[&dimension=dx:l8EBYjaTRBA&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:l8EBYjaTRBA&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:bdAdv2TQZlr&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:bdAdv2TQZlr&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[12]='[&dimension=dx:fzBGwA0Gq4V&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:fzBGwA0Gq4V&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:Z8fvooSLpOd&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:Z8fvooSLpOd&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[13]='[&dimension=dx:yciVY8Dc0q1&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:yciVY8Dc0q1&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:xJVpz7Mjcx8&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:xJVpz7Mjcx8&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[14]='[&dimension=dx:MWmqTyBicmV&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:MWmqTyBicmV&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:VlT0umjv4jr&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:VlT0umjv4jr&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[15]='[&dimension=dx:ijbqWUazl7m&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:ijbqWUazl7m&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:hKL919hCw5C&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:hKL919hCw5C&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[16]='[&dimension=dx:oRfhedLYFJY&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:oRfhedLYFJY&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:PN5JkWKHfzI&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:PN5JkWKHfzI&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[17]='[&dimension=dx:acoTkRToz0d&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:acoTkRToz0d&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:LjvK9v5wqeA&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:LjvK9v5wqeA&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+    morbidityFormulaArray[18]='[&dimension=dx:xKW6edOd8w2&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:xKW6edOd8w2&filter=dnTkTGou2TT:K0JjVmoa8kC]+[&dimension=dx:q8tZPF3Mbb0&filter=dnTkTGou2TT:QT0Hk38rIoN]+[&dimension=dx:q8tZPF3Mbb0&filter=dnTkTGou2TT:K0JjVmoa8kC]';
+
+
+
+
+    morbidityFormulaArray[19]='[&dimension=dx:wU1SjRePNOQ]+[&dimension=dx:lpAQHmctEVb]';
+    morbidityFormulaArray[20]='[&dimension=dx:Stv7TPtz4YP]+[&dimension=dx:RWz7pZ89oFK]';
+    morbidityFormulaArray[21]='[&dimension=dx:gjjMhbKihSP]+[&dimension=dx:Jkf7dzLGkm1]';
+    morbidityFormulaArray[22]='[&dimension=dx:hiDWXvfAOWV]+[&dimension=dx:rWJpL7rjbBH]';
+    morbidityFormulaArray[23]='[&dimension=dx:v4wrJN1TAL1]+[&dimension=dx:CJgkFktZcV1]';
+    morbidityFormulaArray[24]='[&dimension=dx:mboD1AFRmui]+[&dimension=dx:da6MNmOIF8w]';
+    morbidityFormulaArray[25]='[&dimension=dx:ygdLgCupISz]+[&dimension=dx:ramZzhx21Bj]';
+    morbidityFormulaArray[26]='[&dimension=dx:LIm58Gv2yLQ]+[&dimension=dx:NNiLfBShj9B]';
+    morbidityFormulaArray[27]='[&dimension=dx:xqkJoai9Ub2]+[&dimension=dx:j1zkkMnNhSl]';
+    morbidityFormulaArray[28]='[&dimension=dx:r9Yq04ubuQr]+[&dimension=dx:VERQOpXbPzD]';
+    morbidityFormulaArray[29]='[&dimension=dx:iKUwgCqYMen]+[&dimension=dx:Fd6q5LtXOU1]';
+    morbidityFormulaArray[30]='[&dimension=dx:bpBRZa7xduT]+[&dimension=dx:h2RnDOxTUdv]';
+    morbidityFormulaArray[31]='[&dimension=dx:wtRMBNKKi6t]+[&dimension=dx:MRkyN1nb35W]';
+    morbidityFormulaArray[32]='[&dimension=dx:nMgRu6locfE]+[&dimension=dx:Mi6ST2XF4Nw]';
+    morbidityFormulaArray[33]='[&dimension=dx:PMaL5BM4eCi]+[&dimension=dx:Hz4sg9Ufntu]';
+    morbidityFormulaArray[34]='[&dimension=dx:bMdwG64EVhN]+[&dimension=dx:ouZw0qTHGAb]';
+    morbidityFormulaArray[35]='[&dimension=dx:kRp3dYdnvxs]+[&dimension=dx:VLu1UhDsc3N]';
+    morbidityFormulaArray[36]='[&dimension=dx:BhqIlnkCYrY]+[&dimension=dx:ZUj7B7oTULC]';
+    morbidityFormulaArray[37]='[&dimension=dx:qlsObbtey7n]+[&dimension=dx:tMCe36hqbYn]';
+    morbidityFormulaArray[38]='[&dimension=dx:hwupv9DYA8k]+[&dimension=dx:SvBxnS0vp1H]';
+    morbidityFormulaArray[39]='[&dimension=dx:GNpOcrUHjbT]+[&dimension=dx:y3TNSEf3pLo]';
+    morbidityFormulaArray[40]='[&dimension=dx:iWDzrRCcDLW]+[&dimension=dx:sAkiKU9hV5h]';
+    morbidityFormulaArray[41]='[&dimension=dx:SL0ZKVE7w8Z]+[&dimension=dx:B91TcnXWeam]';
+    morbidityFormulaArray[42]='[&dimension=dx:NYZmXxejBOu]+[&dimension=dx:xuNBoJNgN6f]';
+    morbidityFormulaArray[43]='[&dimension=dx:ZiLZKx35oXf]+[&dimension=dx:vlXyVTDaS4N]';
+    morbidityFormulaArray[44]='[&dimension=dx:NgdG6a7uXxB]+[&dimension=dx:wOPljcxDaTM]';
+    morbidityFormulaArray[45]='[&dimension=dx:IOswN5TC8CS]+[&dimension=dx:iMRuVsU3eka]';
+    morbidityFormulaArray[46]='[&dimension=dx:pBYHiJ5RamT]+[&dimension=dx:rmdxXIuOAQD]';
+    morbidityFormulaArray[47]='[&dimension=dx:SXDIXHMzalv]+[&dimension=dx:dQE5eEAW0UN]';
+    morbidityFormulaArray[48]='[&dimension=dx:f5occrtU5j5]+[&dimension=dx:tOARcNRJ0vQ]';
+    morbidityFormulaArray[49]='[&dimension=dx:BNLQJi4YAxb]+[&dimension=dx:MP6d8EdS2k2]';
+    morbidityFormulaArray[50]='[&dimension=dx:lAD8AqgwjIe]+[&dimension=dx:ZzqmMtne7eE]';
+    morbidityFormulaArray[51]='[&dimension=dx:BaUvaLXCCfK]+[&dimension=dx:zVfVg1dAQvw]';
+
+
+
+
+
+    var fillMorbidityArrayValues = function( analyticsURL, formula,arrayIndex){
+        morbidityValuesArray[arrayIndex]=fillFormulaValuesArray(analyticsURL,formula);
+    }
+
+
+
+        var reportLogic = function () {
+
+            //--------Get all parameters from session memory------//
+            dhisBaseURL = sessionStorage.getItem('dhisBaseURL');
+            var periodList = sessionStorage.getItem('periodList');
+            var startDate = sessionStorage.getItem('startDate');
+            var endDate = sessionStorage.getItem('endDate');
+            //-----------------------------------------------------//
+
+            var xmlDoc=loadXMLDoc("assets/xml/IMC_Facilities.xml");
+
+            var GovernorateArray = new Array();
+            var Governorate=xmlDoc.getElementsByTagName("Governorate");
+            for (var i=0;i<Governorate.length;i++){
+                GovernorateArray[i]=Governorate[i].childNodes[0].nodeValue;
+            }
+
+            var DistrictArray = new Array();
+            var District=xmlDoc.getElementsByTagName("District");
+            for (var i=0;i<District.length;i++){
+                DistrictArray[i]=District[i].childNodes[0].nodeValue;
+            }
+
+            var LocationArray = new Array();
+            var Location=xmlDoc.getElementsByTagName("Location");
+            for (var i=0;i<Location.length;i++){
+                LocationArray[i]=Location[i].childNodes[0].nodeValue;
+            }
+
+            var UIDArray = new Array();
+            var UID=xmlDoc.getElementsByTagName("UID");
+            for (var i=0;i<UID.length;i++){
+                UIDArray[i]=UID[i].childNodes[0].nodeValue;
+            }
+
+
+            $('#reportTags').append('<div class="row"><label>' + startDate + ' to ' + endDate + '</label></div>');
+
+            for (var i =0; i < LocationArray.length; i++) {
+                var analyticsURL = dhisBaseURL+'/analytics?' + '&dimension=pe:' + periodList;
+                var GovernorateName = GovernorateArray[i];
+                var DistrictName = DistrictArray[i];
+                var orgUnitName = LocationArray[i];
+                var orgUnitCode = UIDArray[i];
+                analyticsURL = analyticsURL.concat('&filter=ou:' + orgUnitCode);
+
+                for(var j=0;j<morbidityFormulaArray.length;j++){
+                    fillMorbidityArrayValues(analyticsURL,morbidityFormulaArray[j],j)
+                }
+
+                var TempNameArray=morbidityNameArray;
+                var TempValuesArray=morbidityValuesArray;
+
+                var x, y, flag = 1;    // set flag to 1 to start first pass
+                var tempValues;
+                var tempName;     // holding variables
+                var numLength = TempValuesArray.length;
+                for(x = 1; (x <= numLength) && flag; x++){
+                    flag = 0;
+                    for (y=0; y < (numLength -1); y++){
+                        if(TempValuesArray[y]==0){
+                            TempNameArray[y]='-';
+
+                        }
+                        else if (TempValuesArray[y+1] > TempValuesArray[y]){
+                            tempValues = TempValuesArray[y];
+                            tempName=TempNameArray[y]
+
+                            TempValuesArray[y] = TempValuesArray[y+1];
+                            TempNameArray[y] = TempNameArray[y+1];
+
+                            TempValuesArray[y+1] = tempValues;
+                            TempNameArray[y+1] = tempName;
+
+
+                        }
+                        flag = 1;
+                    }
+                }
+
+
+
+                $('#reportTable').append('<tr>' +
+                        '<td>' + GovernorateName + '</td>' +
+                        '<td>' + DistrictName + '</td>' +
+                        '<td>' + orgUnitName + '</td>' +
+                        '<td>' + getMappedFormulaValueReturn(analyticsURL, '[&dimension=dx:yOBwW8LDgdD]+[&dimension=dx:mQ0J604zKSU]+[&dimension=dx:ApzcyKsYP1T]+[&dimension=dx:JNWnOPL0q5a]') + '</td>' +
+                        '<td>' + getMappedFormulaValueReturn(analyticsURL, '[&dimension=dx:ApzcyKsYP1T]+[&dimension=dx:JNWnOPL0q5a]') + '</td>' +
+                        '<td>' + getMappedFormulaValueReturn(analyticsURL, '[&dimension=dx:yerVBMtBicG]+[&dimension=dx:gjWpr3XeCuy]+[&dimension=dx:cJtekahl8hq]+[&dimension=dx:u6VcRN0u9GW]+[&dimension=dx:uJO8yCRDAUV]+[&dimension=dx:LCrtjXvS91u]+[&dimension=dx:zdPezO4reWF]+[&dimension=dx:cQIDZD16r40]+[&dimension=dx:oK9RFG3CVKN]+[&dimension=dx:Cpksvve6jcX]+[&dimension=dx:EnKx6wBotds]+[&dimension=dx:vgCfe0JfhvA]') + '</td>' +
+                        '<td>' + getMappedFormulaValueReturn(analyticsURL, '[&dimension=dx:PT77HBBWxOV]+[&dimension=dx:kkml7US4sV9]+[&dimension=dx:x2bSM4FOsQt]+[&dimension=dx:gkTBJq8ZluH]+[&dimension=dx:vnBcv0BPAYN]+[&dimension=dx:jWL4LHUyOfJ]+[&dimension=dx:cStTgIVmnv1]+[&dimension=dx:rvzTiQTmkP9]+[&dimension=dx:bLRwksuqu6V]+[&dimension=dx:Xbjs1IunB4T]+[&dimension=dx:BzqbsOXoms4]+[&dimension=dx:lh2WYM2ymiF]+[&dimension=dx:e8cI74N4Eeb]+[&dimension=dx:twQ06xMPwwK]+[&dimension=dx:OSKhn68S0g7]+[&dimension=dx:FaVIZMoA2dl]+[&dimension=dx:LtYZBMOnTgk]+[&dimension=dx:rSMIzc1RyVD]+[&dimension=dx:gnNCMJl0LQv]+[&dimension=dx:gVqakyhSnuV]') + '</td>' +
+                        '<td>' + getMappedFormulaValueReturn(analyticsURL, '[&dimension=dx:V2P3KJI4x1U]+[&dimension=dx:AhtJRgFPQO8]+[&dimension=dx:jG2D6BG2Lqr]+[&dimension=dx:mggLT43XZYo]+[&dimension=dx:TIYekTlseqm]+[&dimension=dx:w64FK1SkU7c]+[&dimension=dx:vSkqLxnkCBj]+[&dimension=dx:mUK3JPHRgPS]+[&dimension=dx:hRx7E3pViUp]+[&dimension=dx:ywYLaeWy00y]+[&dimension=dx:K7s5RIGftGm]+[&dimension=dx:bF6Bz8x1Fxi]') + '</td>' +
+                        '<td>' + getMappedFormulaValueReturn(analyticsURL, '[&dimension=dx:OzpDY9WSpOp]+[&dimension=dx:mzrQ43CYuxA]+[&dimension=dx:y44HJcfyzWx]+[&dimension=dx:QxmCkW9JUt7]+[&dimension=dx:HOuMXEsdDoG]+[&dimension=dx:TdWjWm7aYkV]+[&dimension=dx:Nl8jIvEWzz2]+[&dimension=dx:eYBI2PdxLdE]+[&dimension=dx:GUbwhkOvnAZ]+[&dimension=dx:z3QWGII3hEy]+[&dimension=dx:LA2GvywGT5H]+[&dimension=dx:xaYXArBdZ4I]') + '</td>' +
+                        '<td>'+TempNameArray[0]+'</td>' +
+                        '<td>'+TempValuesArray[0]+'</td>' +
+                        '<td>'+TempNameArray[1]+'</td>' +
+                        '<td>'+TempValuesArray[1]+'</td>' +
+                        '<td>'+TempNameArray[2]+'</td>' +
+                        '<td>'+TempValuesArray[2]+'</td>' +
+                        '<td>' + getMappedFormulaValueReturn(analyticsURL, morbidityFormulaArray[29]) + '</td>' +
+                        '</tr>');
+            }
+            reportNotNull=returnReportStatus();
+        }
+
+
+
+
+    $(document).ready(function () {
+        reportNotNull=false;
+        document.getElementById('noValues').style.display='none';
+        document.getElementById('reportInside').style.display='none';
+        document.getElementById('head').style.display='block';
+
+        reportLogic();
+    $("#btnExport").click(function (e) {
+        tableToExcel('tableContainer', 'Consultation Donor Wise Report');
+        e.preventDefault();
+    });
+        $("#btnBack").click(function (e) {
+            reportNotNull=false;
+            window.history.go(-1);
+        });
+        $("#btnBack2").click(function (e) {
+            reportNotNull=false;
+            window.history.go(-1);
+        });
+        $("#btnHome").click(function (e) {
+            var hrefURL=dhisBaseURL.substring(0,dhisBaseURL.length-3);
+            window.location.href = hrefURL+'dhis-web-dashboard-integration/index.action';
+        });
+        $("#btnPrint").click(function (e) {
+            var headstr = "<html><head><title></title></head><body>";
+            var footstr = "</body>";
+            var reportName=document.getElementById('reportName').innerHTML;
+            var newstr = document.all.item('tableContainer').innerHTML;
+            var oldstr = document.body.innerHTML;
+            document.body.innerHTML = headstr+reportName+newstr+footstr;
+            window.print();
+            document.body.innerHTML = oldstr;
+        });
+        if(reportNotNull){
+            document.getElementById('head').style.display='none';
+            document.getElementById('reportInside').style.display='block';
+        }
+        else{
+            document.getElementById('head').style.display='none';
+            document.getElementById('noValues').style.display='block';
+        }
+    });
+
+
+
+    </script>
+
+
+
+</head>
+<body id="pageBody">
+<div id="navigation" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            <img src="assets/img/news.png" width="35px" height="35px">
+                            &NonBreakingSpace;
+                            <b>[Custom-Reports]</b>
+                        </a>
+                        <label>
+                            <span class="navbar-fixed-top" id="btnHome" style="padding-left:90%; padding-top: 20px">
+                                <div class="label btn-primary">&nbsp;&nbsp;Home&nbsp;&nbsp;</div>
+                            </span>
+                        </label>
+                    </span>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav"></ul>
+        </div>
+    </div>
+</div>
+<div class="container" id="head" style="padding-top: 20%">
+    <div style="margin:auto;text-align: center">Report is Loading...</div>
+    <div class="progress progress-striped active" id="cover">
+        <div class="progress-bar progress-bar-info"
+             role="progressbar"
+             aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+             style="width: 100%;">
+        </div>
+    </div>
+</div>
+<div class="container" id="page" style="padding-top: 60px">
+
+    <div class="container" id="reportInside">
+        <div class="row">
+            <div class="col-md-8" id="reportName">
+        <label><span class="label label-primary">Consultation Donor Wise Report</span></label>
+    </div>
+            <div class="col-md-2">
+                <div style="float: left"><label><span class="label btn-success" id="btnBack">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+            </div>
+            <div class="col-md-1">
+                <div style="float: right"><label><span class="label btn-success" id="btnExport">&nbsp;Export to Excel&nbsp;</span></label></div>
+            </div>
+            <div class="col-md-1">
+                <div style="float: left"><label><span class="label btn-success" id="btnPrint">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+            </div>
+</div>
+
+
+    <div class="container">
+        <div class="col-md-12" id="tableContainer" style="padding-top: 20px">
+            <div class="col-md-6"  id="reportTags"></div>
+            <div class="col-md-6"></div>
+            <table class="bordered" id="reportTable">
+                <tr>
+                    <th rowspan="2">Governorate</th>
+                    <th rowspan="2">District</th>
+                    <th rowspan="2">Location</th>
+                    <th rowspan="2">Consultations</th>
+                    <th rowspan="2">Female</th>
+                    <th rowspan="2">Conflict</th>
+                    <th rowspan="2">Chronic</th>
+                    <th rowspan="2">Major Surgery</th>
+                    <th rowspan="2">MINOR</th>
+                    <th colspan="6">Top Morbidities:</th>
+                    <th rowspan="2">Leishmaniasis</th>
+                </tr>
+                <tr>
+                    <th>1st morbidity</th>
+                    <th># of cases</th>
+                    <th>2nd morbidity</th>
+                    <th># of cases</th>
+                    <th>3rd morbidity</th>
+                    <th># of cases</th>
+                </tr>
+            </table>
+
+<br>
+
+
+
+</div>
+</div>
+</div>
+</div>
+
+<div id="noValues" style="padding-top: 5%">
+    <div class="row">
+        <div class="col-md-5"></div>
+        <div class="col-md-2"> <img src="assets/img/noValues.png"> </div>
+        <div class="col-md-5"></div>
+    </div>
+    <h1 style="text-align: center">No values found. Please change report parameters.</h1><br>
+    <div class="row">
+        <div class="col-md-5"></div>
+        <div class="col-md-2">
+            <div style="float: left"><label><span class="label btn-success" id="btnBack2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+        </div>
+        <div class="col-md-5"></div>
+    </div>
+</div>
+</body>
+</html>

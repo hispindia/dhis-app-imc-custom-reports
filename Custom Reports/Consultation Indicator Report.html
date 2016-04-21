@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="IMC Custom Reporting App">
+<meta name="author" content="Gaurav<gaurav08021@gmail.com>">
+<link rel="shortcut icon" href="assets/ico/favicon.png">
+
+<title>Custom Reports</title>
+<!-- Bootstrap core CSS -->
+<link href="assets/css/bootstrap.css" rel="stylesheet">
+<!-- Jasny Bootstrap-Extension CSS -->
+<link href="assets/css/jasny-bootstrap.css" rel="stylesheet">
+<link href="assets/css/bootstrap-select.css" rel="stylesheet">
+<link href="assets/css/bootstrap-datetimepicker.css" rel="stylesheet">
+<!-- Custom styles for this template -->
+<link href="assets/css/main.css" rel="stylesheet">
+<link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet'
+      type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Raleway:400,300,700' rel='stylesheet' type='text/css'>
+<link href='assets/css/bordered.css' rel='stylesheet' type='text/css'>
+
+
+<script type="text/javascript" src="assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="assets/js/bootstrap.js"></script>
+<script type="text/javascript" src="assets/js/jasny-bootstrap.js"></script>
+<script type="text/javascript" src="assets/js/bootstrap-select.js"></script>
+<script type="text/javascript" src="assets/js/moment.js"></script>
+<script type="text/javascript" src="assets/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="assets/js/exportExcel.js"></script>
+<script type="text/javascript" src="assets/js/reportValues.js"></script>
+
+<script type="application/javascript">
+var dhisBaseURL='';
+
+
+var reportLogic = function () {
+
+    //--------Get all parameters from session memory------//
+    dhisBaseURL = sessionStorage.getItem('dhisBaseURL');
+    var orgUnitName = sessionStorage.getItem('orgUnitName');
+    var startDate = sessionStorage.getItem('startDate');
+    var endDate = sessionStorage.getItem('endDate');
+    var donorName = sessionStorage.getItem('donorName');
+    var impName = sessionStorage.getItem('impName');
+    var orgUnitGroupName = sessionStorage.getItem('orgUnitGroupName');
+    var orgUnitLevelName = sessionStorage.getItem('orgUnitLevelName');
+    var donorCode = sessionStorage.getItem('donorCode');
+    var impCode = sessionStorage.getItem('impCode');
+    var orgUnitGroupCode = sessionStorage.getItem('orgUnitGroupCode');
+    var orgUnitLevelCode = sessionStorage.getItem('orgUnitLevelCode');
+    var orgUnitCode = sessionStorage.getItem('orgUnitCode');
+    var periodList = sessionStorage.getItem('periodList');
+    //-----------------------------------------------------//
+
+
+    var analyticsURL = dhisBaseURL+'/analytics?' + '&dimension=pe:' + periodList;
+
+    console.log(donorCode);
+    console.log(impCode);
+    console.log(orgUnitGroupCode);
+    console.log(orgUnitLevelCode);
+    console.log(orgUnitCode);
+    console.log(donorCode);
+    console.log(startDate);
+    console.log(endDate);
+    console.log(donorName);
+    console.log(impName);
+
+    if (orgUnitCode != "") {
+        $('#reportTags').append('<div class="row"></row><label>Org. Unit Name: ' + orgUnitName + '</label></div>');
+        analyticsURL = analyticsURL.concat('&filter=ou:' + orgUnitCode);
+    }
+    else if (orgUnitGroupCode != "") {
+        $('#reportTags').append('<div class="row"><label>Org. Unit Group: ' + orgUnitGroupName + '</label></div>');
+        analyticsURL = analyticsURL.concat('&filter=ou:' + orgUnitCode);
+    }
+    else {
+        $('#reportTags').append('<div class="row"><label>Org. Unit Level: ' + orgUnitLevelName + '</label></div>');
+        analyticsURL = analyticsURL.concat('&filter=ou:' + orgUnitCode);
+    }
+
+    $('#reportTags').append('<div class="row"><label>' + startDate + ' to ' + endDate + '</label></div>');
+
+    if (donorCode != "") {
+        $('#reportTags').append('<div class="row"><label>Donor: ' + donorName + '</label></div>');
+        analyticsURL = analyticsURL.concat('&filter=ou:' + orgUnitCode);
+    }
+    if (impCode != "") {
+        $('#reportTags').append('<div class="row"><label>Implementation Partner: ' + impName + '</label></div>');
+        analyticsURL = analyticsURL.concat('&filter=ou:' + orgUnitCode);
+    }
+
+    //-----------------------Arrays for categories-----------------------------------//
+
+    var categoryGenderFilterArray=new Array(2);
+    categoryGenderFilterArray[0]='&filter=dnTkTGou2TT:QT0Hk38rIoN';//Males
+    categoryGenderFilterArray[1]='&filter=dnTkTGou2TT:K0JjVmoa8kC';//Females
+
+    var categoryAgeFilterArray=new Array(6);
+    categoryAgeFilterArray[0]='&filter=KPrmQk3MQau:cUkiDwbsNAE';    //0-11
+    categoryAgeFilterArray[1]='&filter=KPrmQk3MQau:baFPsNHckYI';    //1-4
+    categoryAgeFilterArray[2]='&filter=KPrmQk3MQau:mJXz8XMPfod';    //5-14
+    categoryAgeFilterArray[3]='&filter=KPrmQk3MQau:pmt8j58oArW';    //15-49
+    categoryAgeFilterArray[4]='&filter=KPrmQk3MQau:B3DlDpSYQfr';    //50-60
+    categoryAgeFilterArray[5]='&filter=KPrmQk3MQau:QfpbuAqtnRV';    //60+
+
+    //-----------------------End of Arrays for categories-----------------------------------//
+
+    //-----------------------------------Total consultations formula building-------------------------------//
+
+    var morbidityDEArray=new Array();
+    morbidityDEArray[0]='&dimension=dx:wU1SjRePNOQ';
+    morbidityDEArray[1]='&dimension=dx:Stv7TPtz4YP';
+    morbidityDEArray[2]='&dimension=dx:gjjMhbKihSP';
+    morbidityDEArray[3]='&dimension=dx:hiDWXvfAOWV';
+    morbidityDEArray[4]='&dimension=dx:v4wrJN1TAL1';
+    morbidityDEArray[5]='&dimension=dx:mboD1AFRmui';
+    morbidityDEArray[6]='&dimension=dx:ygdLgCupISz';
+    morbidityDEArray[7]='&dimension=dx:LIm58Gv2yLQ';
+    morbidityDEArray[8]='&dimension=dx:xqkJoai9Ub2';
+    morbidityDEArray[9]='&dimension=dx:r9Yq04ubuQr';
+    morbidityDEArray[10]='&dimension=dx:iKUwgCqYMen';
+    morbidityDEArray[11]='&dimension=dx:bpBRZa7xduT';
+    morbidityDEArray[12]='&dimension=dx:wtRMBNKKi6t';
+    morbidityDEArray[13]='&dimension=dx:nMgRu6locfE';
+    morbidityDEArray[14]='&dimension=dx:PMaL5BM4eCi';
+    morbidityDEArray[15]='&dimension=dx:bMdwG64EVhN';
+    morbidityDEArray[16]='&dimension=dx:kRp3dYdnvxs';
+    morbidityDEArray[17]='&dimension=dx:BhqIlnkCYrY';
+    morbidityDEArray[18]='&dimension=dx:qlsObbtey7n';
+    morbidityDEArray[19]='&dimension=dx:hwupv9DYA8k';
+    morbidityDEArray[20]='&dimension=dx:GNpOcrUHjbT';
+    morbidityDEArray[21]='&dimension=dx:iWDzrRCcDLW';
+    morbidityDEArray[22]='&dimension=dx:SL0ZKVE7w8Z';
+    morbidityDEArray[23]='&dimension=dx:NYZmXxejBOu';
+    morbidityDEArray[24]='&dimension=dx:ZiLZKx35oXf';
+    morbidityDEArray[25]='&dimension=dx:NgdG6a7uXxB';
+    morbidityDEArray[26]='&dimension=dx:IOswN5TC8CS';
+    morbidityDEArray[27]='&dimension=dx:pBYHiJ5RamT';
+    morbidityDEArray[28]='&dimension=dx:SXDIXHMzalv';
+    morbidityDEArray[29]='&dimension=dx:f5occrtU5j5';
+    morbidityDEArray[30]='&dimension=dx:BNLQJi4YAxb';
+    morbidityDEArray[31]='&dimension=dx:lAD8AqgwjIe';
+    morbidityDEArray[32]='&dimension=dx:BaUvaLXCCfK';
+    morbidityDEArray[33]='&dimension=dx:QMusE7HZZay';
+
+    morbidityDEArray[34]='&dimension=dx:lpAQHmctEVb';
+    morbidityDEArray[35]='&dimension=dx:RWz7pZ89oFK';
+    morbidityDEArray[36]='&dimension=dx:Jkf7dzLGkm1';
+    morbidityDEArray[37]='&dimension=dx:rWJpL7rjbBH';
+    morbidityDEArray[38]='&dimension=dx:CJgkFktZcV1';
+    morbidityDEArray[39]='&dimension=dx:da6MNmOIF8w';
+    morbidityDEArray[40]='&dimension=dx:ramZzhx21Bj';
+    morbidityDEArray[41]='&dimension=dx:NNiLfBShj9B';
+    morbidityDEArray[42]='&dimension=dx:j1zkkMnNhSl';
+    morbidityDEArray[43]='&dimension=dx:VERQOpXbPzD';
+    morbidityDEArray[44]='&dimension=dx:Fd6q5LtXOU1';
+    morbidityDEArray[45]='&dimension=dx:h2RnDOxTUdv';
+    morbidityDEArray[46]='&dimension=dx:MRkyN1nb35W';
+    morbidityDEArray[47]='&dimension=dx:Mi6ST2XF4Nw';
+    morbidityDEArray[48]='&dimension=dx:Hz4sg9Ufntu';
+    morbidityDEArray[49]='&dimension=dx:ouZw0qTHGAb';
+    morbidityDEArray[50]='&dimension=dx:VLu1UhDsc3N';
+    morbidityDEArray[51]='&dimension=dx:ZUj7B7oTULC';
+    morbidityDEArray[52]='&dimension=dx:tMCe36hqbYn';
+    morbidityDEArray[53]='&dimension=dx:SvBxnS0vp1H';
+    morbidityDEArray[54]='&dimension=dx:y3TNSEf3pLo';
+    morbidityDEArray[55]='&dimension=dx:sAkiKU9hV5h';
+    morbidityDEArray[56]='&dimension=dx:B91TcnXWeam';
+    morbidityDEArray[57]='&dimension=dx:xuNBoJNgN6f';
+    morbidityDEArray[58]='&dimension=dx:vlXyVTDaS4N';
+    morbidityDEArray[59]='&dimension=dx:wOPljcxDaTM';
+    morbidityDEArray[60]='&dimension=dx:iMRuVsU3eka';
+    morbidityDEArray[61]='&dimension=dx:rmdxXIuOAQD';
+    morbidityDEArray[62]='&dimension=dx:dQE5eEAW0UN';
+    morbidityDEArray[63]='&dimension=dx:tOARcNRJ0vQ';
+    morbidityDEArray[64]='&dimension=dx:MP6d8EdS2k2';
+    morbidityDEArray[65]='&dimension=dx:ZzqmMtne7eE';
+    morbidityDEArray[66]='&dimension=dx:zVfVg1dAQvw';
+    morbidityDEArray[67]='&dimension=dx:t7QmAdLkV0h';
+
+
+    var morbidityFormulaFollowUpMaleArray=new Array(6);
+    for(var c=0;c<categoryAgeFilterArray.length;c++){
+        morbidityFormulaFollowUpMaleArray[c]='';
+        for(var d=0;d<34;d++){
+            morbidityFormulaFollowUpMaleArray[c]+='['+morbidityDEArray[d]+categoryGenderFilterArray[0]+categoryAgeFilterArray[c]+']';
+            if(d!=33){
+                morbidityFormulaFollowUpMaleArray[c]+='+';
+            }
+        }
+    }
+    var morbidityFormulaFollowUpMaleSub='';
+    for(var d=0;d<34;d++){
+        morbidityFormulaFollowUpMaleSub+='['+morbidityDEArray[d]+categoryGenderFilterArray[0]+']';
+        if(d!=33){
+            morbidityFormulaFollowUpMaleSub+='+';
+        }
+    }
+
+    var morbidityFormulaFollowUpFemaleArray=new Array(6);
+    for(var c=0;c<categoryAgeFilterArray.length;c++){
+        morbidityFormulaFollowUpFemaleArray[c]='';
+        for(var d=0;d<34;d++){
+            morbidityFormulaFollowUpFemaleArray[c]+='['+morbidityDEArray[d]+categoryGenderFilterArray[1]+categoryAgeFilterArray[c]+']';
+            if(d!=33){
+                morbidityFormulaFollowUpFemaleArray[c]+='+';
+            }
+        }
+    }
+
+    var morbidityFormulaFollowUpFemaleSub='';
+    for(var d=0;d<34;d++){
+        morbidityFormulaFollowUpFemaleSub+='['+morbidityDEArray[d]+categoryGenderFilterArray[1]+']';
+        if(d!=33){
+            morbidityFormulaFollowUpFemaleSub+='+';
+        }
+    }
+
+    var morbidityFormulaFollowUpSub='';
+    for(var d=0;d<34;d++){
+        morbidityFormulaFollowUpSub+='['+morbidityDEArray[d]+']';
+        if(d!=33){
+            morbidityFormulaFollowUpSub+='+';
+        }
+    }
+
+    var morbidityFormulaNewMaleArray=new Array(6);
+    for(var c=0;c<categoryAgeFilterArray.length;c++){
+        morbidityFormulaNewMaleArray[c]='';
+        for(var d=34;d<68;d++){
+            morbidityFormulaNewMaleArray[c]+='['+morbidityDEArray[d]+categoryGenderFilterArray[0]+categoryAgeFilterArray[c]+']';
+            if(d!=67){
+                morbidityFormulaNewMaleArray[c]+='+';
+            }
+        }
+    }
+    var morbidityFormulaNewMaleSub='';
+    for(var d=34;d<68;d++){
+        morbidityFormulaNewMaleSub+='['+morbidityDEArray[d]+categoryGenderFilterArray[0]+']';
+        if(d!=67){
+            morbidityFormulaNewMaleSub+='+';
+        }
+    }
+
+    var morbidityFormulaNewFemaleArray=new Array(6);
+    for(var c=0;c<categoryAgeFilterArray.length;c++){
+        morbidityFormulaNewFemaleArray[c]='';
+        for(var d=34;d<68;d++){
+            morbidityFormulaNewFemaleArray[c]+='['+morbidityDEArray[d]+categoryGenderFilterArray[1]+categoryAgeFilterArray[c]+']';
+            if(d!=67){
+                morbidityFormulaNewFemaleArray[c]+='+';
+            }
+        }
+    }
+
+    var morbidityFormulaNewFemaleSub='';
+    for(var d=34;d<68;d++){
+        morbidityFormulaNewFemaleSub+='['+morbidityDEArray[d]+categoryGenderFilterArray[1]+']';
+        if(d!=67){
+            morbidityFormulaNewFemaleSub+='+';
+        }
+    }
+
+    var morbidityFormulaNewSub='';
+    for(var d=34;d<68;d++){
+        morbidityFormulaNewSub+='['+morbidityDEArray[d]+']';
+        if(d!=67){
+            morbidityFormulaNewSub+='+';
+        }
+    }
+
+    var TotalMale0to11formula='('+morbidityFormulaFollowUpMaleArray[0]+'+'+morbidityFormulaNewMaleArray[0]+')';
+    var TotalMale1to4formula='('+morbidityFormulaFollowUpMaleArray[1]+'+'+morbidityFormulaNewMaleArray[1]+')';
+    var TotalMale5to14formula='('+morbidityFormulaFollowUpMaleArray[2]+'+'+morbidityFormulaNewMaleArray[2]+')';
+    var TotalMale15to49formula='('+morbidityFormulaFollowUpMaleArray[3]+'+'+morbidityFormulaNewMaleArray[3]+')';
+    var TotalMale50to60formula='('+morbidityFormulaFollowUpMaleArray[4]+'+'+morbidityFormulaNewMaleArray[4]+')';
+    var TotalMaleAbove60formula='('+morbidityFormulaFollowUpMaleArray[5]+'+'+morbidityFormulaNewMaleArray[5]+')';
+    var TotalFemale0to11formula='('+morbidityFormulaFollowUpFemaleArray[0]+'+'+morbidityFormulaNewFemaleArray[0]+')';
+    var TotalFemale1to4formula='('+morbidityFormulaFollowUpFemaleArray[1]+'+'+morbidityFormulaNewFemaleArray[1]+')';
+    var TotalFemale5to14formula='('+morbidityFormulaFollowUpFemaleArray[2]+'+'+morbidityFormulaNewFemaleArray[2]+')';
+    var TotalFemale15to49formula='('+morbidityFormulaFollowUpFemaleArray[3]+'+'+morbidityFormulaNewFemaleArray[3]+')';
+    var TotalFemale50to60formula='('+morbidityFormulaFollowUpFemaleArray[4]+'+'+morbidityFormulaNewFemaleArray[4]+')';
+    var TotalFemaleAbove60formula='('+morbidityFormulaFollowUpFemaleArray[5]+'+'+morbidityFormulaNewFemaleArray[5]+')';
+    var TotalTotal0to11formula='('+morbidityFormulaFollowUpMaleArray[0]+'+'+morbidityFormulaNewMaleArray[0]+'+'+morbidityFormulaFollowUpFemaleArray[0]+'+'+morbidityFormulaNewFemaleArray[0]+')';
+    var TotalTotal1to4formula='('+morbidityFormulaFollowUpMaleArray[1]+'+'+morbidityFormulaNewMaleArray[1]+'+'+morbidityFormulaFollowUpFemaleArray[1]+'+'+morbidityFormulaNewFemaleArray[1]+')';
+    var TotalTotal5to14formula='('+morbidityFormulaFollowUpMaleArray[2]+'+'+morbidityFormulaNewMaleArray[2]+'+'+morbidityFormulaFollowUpFemaleArray[2]+'+'+morbidityFormulaNewFemaleArray[2]+')';
+    var TotalTotal15to49formula='('+morbidityFormulaFollowUpMaleArray[3]+'+'+morbidityFormulaNewMaleArray[3]+'+'+morbidityFormulaFollowUpFemaleArray[3]+'+'+morbidityFormulaNewFemaleArray[3]+')';
+    var TotalTotal50to60formula='('+morbidityFormulaFollowUpMaleArray[4]+'+'+morbidityFormulaNewMaleArray[4]+'+'+morbidityFormulaFollowUpFemaleArray[4]+'+'+morbidityFormulaNewFemaleArray[4]+')';
+    var TotalTotalAbove60formula='('+morbidityFormulaFollowUpMaleArray[5]+'+'+morbidityFormulaNewMaleArray[5]+'+'+morbidityFormulaFollowUpFemaleArray[5]+'+'+morbidityFormulaNewFemaleArray[5]+')';
+
+    //-----------------------------------End of Total consultations formula building-------------------------------//
+
+     //-----------Number of consultations, by sex and age Section Mapping------------------//
+
+     getMappedFormulaValue(analyticsURL,TotalMale0to11formula ,'#Consultations0to11Male');
+     getMappedFormulaValue(analyticsURL,TotalMale1to4formula,'#Consultations1to4Male');
+     getMappedFormulaValue(analyticsURL,TotalMale5to14formula ,'#Consultations5to14Male');
+     getMappedFormulaValue(analyticsURL,TotalMale15to49formula ,'#Consultations15to49Male');
+     getMappedFormulaValue(analyticsURL,TotalMale50to60formula ,'#Consultations50to60Male');
+     getMappedFormulaValue(analyticsURL,TotalMaleAbove60formula ,'#ConsultationsAbove60Male');
+
+    getMappedFormulaValue(analyticsURL,TotalFemale0to11formula ,'#Consultations0to11Female');
+    getMappedFormulaValue(analyticsURL,TotalFemale1to4formula,'#Consultations1to4Female');
+    getMappedFormulaValue(analyticsURL,TotalFemale5to14formula ,'#Consultations5to14Female');
+    getMappedFormulaValue(analyticsURL,TotalFemale15to49formula ,'#Consultations15to49Female');
+    getMappedFormulaValue(analyticsURL,TotalFemale50to60formula ,'#Consultations50to60Female');
+    getMappedFormulaValue(analyticsURL,TotalFemaleAbove60formula ,'#ConsultationsAbove60Female');
+
+    getMappedFormulaValue(analyticsURL,TotalTotal0to11formula ,'#Consultations0to11Total');
+    getMappedFormulaValue(analyticsURL,TotalTotal1to4formula,'#Consultations1to4Total');
+    getMappedFormulaValue(analyticsURL,TotalTotal5to14formula ,'#Consultations5to14Total');
+    getMappedFormulaValue(analyticsURL,TotalTotal15to49formula ,'#Consultations15to49Total');
+    getMappedFormulaValue(analyticsURL,TotalTotal50to60formula ,'#Consultations50to60Total');
+    getMappedFormulaValue(analyticsURL,TotalTotalAbove60formula ,'#ConsultationsAbove60Total');
+
+     //-----------End of Number of consultations, by sex and age Section Mapping------------------//
+
+
+    //-------------------------Data Element Array-----------------------------------//
+
+    var DEArray=new Array(12);
+    DEArray[0]='&dimension=dx:vCRTI1cU1vr'; //Mortality - Acute Watery Diarrhea (susp. Cholera)
+    DEArray[1]='&dimension=dx:v4wrJN1TAL1'; //Morbidity - Acute Watery Diarrhea (susp. Cholera) Follow Up
+    DEArray[2]='&dimension=dx:CJgkFktZcV1'; //Morbidity -Acute Watery Diarrhea (susp. Cholera) New
+
+    DEArray[3]='&dimension=dx:jRrMAVrDZFk'; //Mortality - Acute Watery Diarrhea (susp. Cholera)
+    DEArray[4]='&dimension=dx:mboD1AFRmui'; //Morbidity -Acute Bloody Diarrhea (susp. Shigellosis) Follow Up
+    DEArray[5]='&dimension=dx:da6MNmOIF8w'; //Morbidity -Acute Bloody Diarrhea (susp. Shigellosis) New
+
+    DEArray[6]='&dimension=dx:mJ4OS1n2l1e'; //Mortality - Lower Respiratory Tract Infection
+    DEArray[7]='&dimension=dx:wU1SjRePNOQ'; //Morbidity -Lower Respiratory Tract Infection Follow Up
+    DEArray[8]='&dimension=dx:lpAQHmctEVb'; //Morbidity -Lower Respiratory Tract Infection New
+
+    DEArray[9]='&dimension=dx:htFgv12AOAk'; //Mortality - Measles (susp.)
+    DEArray[10]='&dimension=dx:xqkJoai9Ub2'; //Morbidity -Measles (susp.) Follow Up
+    DEArray[11]='&dimension=dx:j1zkkMnNhSl'; //Morbidity -Measles (susp.) New
+
+
+    //----------------------- End of Data Element Array-----------------------------------//
+
+     //-------------------------case fatality rate for diarrhea, by sex and age section mapping-----//
+
+     var Diarrhea0to11MaleFormula='(['+DEArray[0]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+']+['+DEArray[3]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+'])/(['+DEArray[1]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+']+['+DEArray[2]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+']+['+DEArray[4]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+']+['+DEArray[5]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+'])';
+     var Diarrhea1to4MaleFormula='(['+DEArray[0]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+']+['+DEArray[3]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+'])/(['+DEArray[1]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+']+['+DEArray[2]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+']+['+DEArray[4]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+']+['+DEArray[5]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+'])';
+     var Diarrhea5to14MaleFormula='(['+DEArray[0]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+']+['+DEArray[3]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+'])/(['+DEArray[1]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+']+['+DEArray[2]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+']+['+DEArray[4]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+']+['+DEArray[5]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+'])';
+     var Diarrhea15to49MaleFormula='(['+DEArray[0]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+']+['+DEArray[3]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+'])/(['+DEArray[1]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+']+['+DEArray[2]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+']+['+DEArray[4]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+']+['+DEArray[5]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+'])';
+     var Diarrhea50to60MaleFormula='(['+DEArray[0]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+']+['+DEArray[3]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+'])/(['+DEArray[1]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+']+['+DEArray[2]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+']+['+DEArray[4]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+']+['+DEArray[5]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+'])';
+     var DiarrheaAbove60MaleFormula='(['+DEArray[0]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+']+['+DEArray[3]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+'])/(['+DEArray[1]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+']+['+DEArray[2]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+']+['+DEArray[4]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+']+['+DEArray[5]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+'])';
+
+
+    var Diarrhea0to11FemaleFormula='(['+DEArray[0]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+']+['+DEArray[3]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+'])/(['+DEArray[1]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+']+['+DEArray[2]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+']+['+DEArray[4]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+']+['+DEArray[5]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+'])';
+    var Diarrhea1to4FemaleFormula='(['+DEArray[0]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+']+['+DEArray[3]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+'])/(['+DEArray[1]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+']+['+DEArray[2]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+']+['+DEArray[4]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+']+['+DEArray[5]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+'])';
+    var Diarrhea5to14FemaleFormula='(['+DEArray[0]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+']+['+DEArray[3]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+'])/(['+DEArray[1]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+']+['+DEArray[2]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+']+['+DEArray[4]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+']+['+DEArray[5]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+'])';
+    var Diarrhea15to49FemaleFormula='(['+DEArray[0]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+']+['+DEArray[3]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+'])/(['+DEArray[1]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+']+['+DEArray[2]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+']+['+DEArray[4]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+']+['+DEArray[5]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+'])';
+    var Diarrhea50to60FemaleFormula='(['+DEArray[0]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+']+['+DEArray[3]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+'])/(['+DEArray[1]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+']+['+DEArray[2]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+']+['+DEArray[4]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+']+['+DEArray[5]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+'])';
+    var DiarrheaAbove60FemaleFormula='(['+DEArray[0]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+']+['+DEArray[3]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+'])/(['+DEArray[1]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+']+['+DEArray[2]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+']+['+DEArray[4]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+']+['+DEArray[5]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+'])';
+
+    var Diarrhea0to11TotalFormula='(['+DEArray[0]+categoryAgeFilterArray[0]+']+['+DEArray[3]+categoryAgeFilterArray[0]+'])/(['+DEArray[1]+categoryAgeFilterArray[0]+']+['+DEArray[2]+categoryAgeFilterArray[0]+']+['+DEArray[4]+categoryAgeFilterArray[0]+']+['+DEArray[5]+categoryAgeFilterArray[0]+'])';
+    var Diarrhea1to4TotalFormula='(['+DEArray[0]+categoryAgeFilterArray[1]+']+['+DEArray[3]+categoryAgeFilterArray[1]+'])/(['+DEArray[1]+categoryAgeFilterArray[1]+']+['+DEArray[2]+categoryAgeFilterArray[1]+']+['+DEArray[4]+categoryAgeFilterArray[1]+']+['+DEArray[5]+categoryAgeFilterArray[1]+'])';
+    var Diarrhea5to14TotalFormula='(['+DEArray[0]+categoryAgeFilterArray[2]+']+['+DEArray[3]+categoryAgeFilterArray[2]+'])/(['+DEArray[1]+categoryAgeFilterArray[2]+']+['+DEArray[2]+categoryAgeFilterArray[2]+']+['+DEArray[4]+categoryAgeFilterArray[2]+']+['+DEArray[5]+categoryAgeFilterArray[2]+'])';
+    var Diarrhea15to49TotalFormula='(['+DEArray[0]+categoryAgeFilterArray[3]+']+['+DEArray[3]+categoryAgeFilterArray[3]+'])/(['+DEArray[1]+categoryAgeFilterArray[3]+']+['+DEArray[2]+categoryAgeFilterArray[3]+']+['+DEArray[4]+categoryAgeFilterArray[3]+']+['+DEArray[5]+categoryAgeFilterArray[3]+'])';
+    var Diarrhea50to60TotalFormula='(['+DEArray[0]+categoryAgeFilterArray[4]+']+['+DEArray[3]+categoryAgeFilterArray[4]+'])/(['+DEArray[1]+categoryAgeFilterArray[4]+']+['+DEArray[2]+categoryAgeFilterArray[4]+']+['+DEArray[4]+categoryAgeFilterArray[4]+']+['+DEArray[5]+categoryAgeFilterArray[4]+'])';
+    var DiarrheaAbove60TotalFormula='(['+DEArray[0]+categoryAgeFilterArray[5]+']+['+DEArray[3]+categoryAgeFilterArray[5]+'])/(['+DEArray[1]+categoryAgeFilterArray[5]+']+['+DEArray[2]+categoryAgeFilterArray[5]+']+['+DEArray[4]+categoryAgeFilterArray[5]+']+['+DEArray[5]+categoryAgeFilterArray[5]+'])';
+
+    getMappedFormulaValuePercentage(analyticsURL,Diarrhea0to11MaleFormula ,'#Diarrhea0to11Male');
+     getMappedFormulaValuePercentage(analyticsURL,Diarrhea1to4MaleFormula ,'#Diarrhea1to4Male');
+     getMappedFormulaValuePercentage(analyticsURL,Diarrhea5to14MaleFormula ,'#Diarrhea5to14Male');
+     getMappedFormulaValuePercentage(analyticsURL,Diarrhea15to49MaleFormula ,'#Diarrhea15to49Male');
+     getMappedFormulaValuePercentage(analyticsURL,Diarrhea50to60MaleFormula ,'#Diarrhea50to60Male');
+     getMappedFormulaValuePercentage(analyticsURL,DiarrheaAbove60MaleFormula ,'#DiarrheaAbove60Male');
+
+     getMappedFormulaValuePercentage(analyticsURL,Diarrhea0to11FemaleFormula ,'#Diarrhea0to11Female');
+     getMappedFormulaValuePercentage(analyticsURL,Diarrhea1to4FemaleFormula ,'#Diarrhea1to4Female');
+     getMappedFormulaValuePercentage(analyticsURL,Diarrhea5to14FemaleFormula ,'#Diarrhea5to14Female');
+     getMappedFormulaValuePercentage(analyticsURL,Diarrhea15to49FemaleFormula ,'#Diarrhea15to49Female');
+     getMappedFormulaValuePercentage(analyticsURL,Diarrhea50to60FemaleFormula ,'#Diarrhea50to60Female');
+     getMappedFormulaValuePercentage(analyticsURL,DiarrheaAbove60FemaleFormula ,'#DiarrheaAbove60Female');
+
+     getMappedFormulaValuePercentage(analyticsURL,Diarrhea0to11TotalFormula ,'#Diarrhea0to11Total');
+     getMappedFormulaValuePercentage(analyticsURL,Diarrhea1to4TotalFormula ,'#Diarrhea1to4Total');
+     getMappedFormulaValuePercentage(analyticsURL,Diarrhea5to14TotalFormula ,'#Diarrhea5to14Total');
+     getMappedFormulaValuePercentage(analyticsURL,Diarrhea15to49TotalFormula ,'#Diarrhea15to49Total');
+     getMappedFormulaValuePercentage(analyticsURL,Diarrhea50to60TotalFormula ,'#Diarrhea50to60Total');
+     getMappedFormulaValuePercentage(analyticsURL,DiarrheaAbove60TotalFormula ,'#DiarrheaAbove60Total');
+
+     //-------------------------End of case fatality rate for diarrhea, by sex and age section mapping-----//
+
+     //-------------------------case fatality rate for ARI by sex and age section mapping-----//
+
+     var ARI0to11MaleFormula='['+DEArray[6]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+']/(['+DEArray[7]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+']+['+DEArray[8]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+'])';
+     var ARI1to4MaleFormula='['+DEArray[6]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+']/(['+DEArray[7]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+']+['+DEArray[8]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+'])';
+     var ARI5to14MaleFormula='['+DEArray[6]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+']/(['+DEArray[7]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+']+['+DEArray[8]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+'])';
+     var ARI15to49MaleFormula='['+DEArray[6]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+']/(['+DEArray[7]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+']+['+DEArray[8]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+'])';
+     var ARI50to60MaleFormula='['+DEArray[6]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+']/(['+DEArray[7]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+']+['+DEArray[8]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+'])';
+     var ARIAbove60MaleFormula='['+DEArray[6]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+']/(['+DEArray[7]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+']+['+DEArray[8]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+'])';
+
+     var ARI0to11FemaleFormula='['+DEArray[6]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+']/(['+DEArray[7]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+']+['+DEArray[8]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+'])';
+     var ARI1to4FemaleFormula='['+DEArray[6]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+']/(['+DEArray[7]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+']+['+DEArray[8]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+'])';
+     var ARI5to14FemaleFormula='['+DEArray[6]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+']/(['+DEArray[7]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+']+['+DEArray[8]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+'])';
+     var ARI15to49FemaleFormula='['+DEArray[6]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+']/(['+DEArray[7]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+']+['+DEArray[8]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+'])';
+     var ARI50to60FemaleFormula='['+DEArray[6]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+']/(['+DEArray[7]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+']+['+DEArray[8]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+'])';
+     var ARIAbove60FemaleFormula='['+DEArray[6]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+']/(['+DEArray[7]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+']+['+DEArray[8]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+'])';
+
+     var ARI0to11TotalFormula='['+DEArray[6]+categoryAgeFilterArray[0]+']/(['+DEArray[7]+categoryAgeFilterArray[0]+']+['+DEArray[8]+categoryAgeFilterArray[0]+'])';
+     var ARI1to4TotalFormula='['+DEArray[6]+categoryAgeFilterArray[1]+']/(['+DEArray[7]+categoryAgeFilterArray[1]+']+['+DEArray[8]+categoryAgeFilterArray[1]+'])';
+     var ARI5to14TotalFormula='['+DEArray[6]+categoryAgeFilterArray[2]+']/(['+DEArray[7]+categoryAgeFilterArray[2]+']+['+DEArray[8]+categoryAgeFilterArray[2]+'])';
+     var ARI15to49TotalFormula='['+DEArray[6]+categoryAgeFilterArray[3]+']/(['+DEArray[7]+categoryAgeFilterArray[3]+']+['+DEArray[8]+categoryAgeFilterArray[3]+'])';
+     var ARI50to60TotalFormula='['+DEArray[6]+categoryAgeFilterArray[4]+']/(['+DEArray[7]+categoryAgeFilterArray[4]+']+['+DEArray[8]+categoryAgeFilterArray[4]+'])';
+     var ARIAbove60TotalFormula='['+DEArray[6]+categoryAgeFilterArray[5]+']/(['+DEArray[7]+categoryAgeFilterArray[5]+']+['+DEArray[8]+categoryAgeFilterArray[5]+'])';
+
+     getMappedFormulaValuePercentage(analyticsURL,ARI0to11MaleFormula ,'#ARI0to11Male');
+     getMappedFormulaValuePercentage(analyticsURL,ARI1to4MaleFormula ,'#ARI1to4Male');
+     getMappedFormulaValuePercentage(analyticsURL,ARI5to14MaleFormula ,'#ARI5to14Male');
+     getMappedFormulaValuePercentage(analyticsURL,ARI15to49MaleFormula ,'#ARI15to49Male');
+     getMappedFormulaValuePercentage(analyticsURL,ARI50to60MaleFormula ,'#ARI50to60Male');
+     getMappedFormulaValuePercentage(analyticsURL,ARIAbove60MaleFormula ,'#ARIAbove60Male');
+
+     getMappedFormulaValuePercentage(analyticsURL,ARI0to11FemaleFormula ,'#ARI0to11Female');
+     getMappedFormulaValuePercentage(analyticsURL,ARI1to4FemaleFormula ,'#ARI1to4Female');
+     getMappedFormulaValuePercentage(analyticsURL,ARI5to14FemaleFormula ,'#ARI5to14Female');
+     getMappedFormulaValuePercentage(analyticsURL,ARI15to49FemaleFormula ,'#ARI15to49Female');
+     getMappedFormulaValuePercentage(analyticsURL,ARI50to60FemaleFormula ,'#ARI50to60Female');
+     getMappedFormulaValuePercentage(analyticsURL,ARIAbove60FemaleFormula ,'#ARIAbove60Female');
+
+     getMappedFormulaValuePercentage(analyticsURL,ARI0to11TotalFormula ,'#ARI0to11Total');
+     getMappedFormulaValuePercentage(analyticsURL,ARI1to4TotalFormula ,'#ARI1to4Total');
+     getMappedFormulaValuePercentage(analyticsURL,ARI5to14TotalFormula ,'#ARI5to14Total');
+     getMappedFormulaValuePercentage(analyticsURL,ARI15to49TotalFormula ,'#ARI15to49Total');
+     getMappedFormulaValuePercentage(analyticsURL,ARI50to60TotalFormula ,'#ARI50to60Total');
+     getMappedFormulaValuePercentage(analyticsURL,ARIAbove60TotalFormula ,'#ARIAbove60Total');
+
+     //-------------------------End of case fatality rate for ARI by sex and age mapping-----//
+
+     //-------------------------case fatality rate for measles, by sex and age section mapping-----//
+
+     var Measles0to11MaleFormula='['+DEArray[9]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+']/(['+DEArray[10]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+']+['+DEArray[11]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+'])';
+     var Measles1to4MaleFormula='['+DEArray[9]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+']/(['+DEArray[10]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+']+['+DEArray[11]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+'])';
+     var Measles5to14MaleFormula='['+DEArray[9]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+']/(['+DEArray[10]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+']+['+DEArray[11]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+'])';
+     var Measles15to49MaleFormula='['+DEArray[9]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+']/(['+DEArray[10]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+']+['+DEArray[11]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+'])';
+     var Measles50to60MaleFormula='['+DEArray[9]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+']/(['+DEArray[10]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+']+['+DEArray[11]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+'])';
+     var MeaslesAbove60MaleFormula='['+DEArray[9]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+']/(['+DEArray[10]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+']+['+DEArray[11]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+'])';
+
+     var Measles0to11FemaleFormula='['+DEArray[9]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+']/(['+DEArray[10]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+']+['+DEArray[11]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+'])';
+     var Measles1to4FemaleFormula='['+DEArray[9]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+']/(['+DEArray[10]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+']+['+DEArray[11]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+'])';
+     var Measles5to14FemaleFormula='['+DEArray[9]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+']/(['+DEArray[10]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+']+['+DEArray[11]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+'])';
+     var Measles15to49FemaleFormula='['+DEArray[9]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+']/(['+DEArray[10]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+']+['+DEArray[11]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+'])';
+     var Measles50to60FemaleFormula='['+DEArray[9]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+']/(['+DEArray[10]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+']+['+DEArray[11]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+'])';
+     var MeaslesAbove60FemaleFormula='['+DEArray[9]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+']/(['+DEArray[10]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+']+['+DEArray[11]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+'])';
+
+     var Measles0to11TotalFormula='['+DEArray[9]+categoryAgeFilterArray[0]+']/(['+DEArray[10]+categoryAgeFilterArray[0]+']+['+DEArray[11]+categoryAgeFilterArray[0]+'])';
+     var Measles1to4TotalFormula='['+DEArray[9]+categoryAgeFilterArray[1]+']/(['+DEArray[10]+categoryAgeFilterArray[1]+']+['+DEArray[11]+categoryAgeFilterArray[1]+'])';
+     var Measles5to14TotalFormula='['+DEArray[9]+categoryAgeFilterArray[2]+']/(['+DEArray[10]+categoryAgeFilterArray[2]+']+['+DEArray[11]+categoryAgeFilterArray[2]+'])';
+     var Measles15to49TotalFormula='['+DEArray[9]+categoryAgeFilterArray[3]+']/(['+DEArray[10]+categoryAgeFilterArray[3]+']+['+DEArray[11]+categoryAgeFilterArray[3]+'])';
+     var Measles50to60TotalFormula='['+DEArray[9]+categoryAgeFilterArray[4]+']/(['+DEArray[10]+categoryAgeFilterArray[4]+']+['+DEArray[11]+categoryAgeFilterArray[4]+'])';
+     var MeaslesAbove60TotalFormula='['+DEArray[9]+categoryAgeFilterArray[5]+']/(['+DEArray[10]+categoryAgeFilterArray[5]+']+['+DEArray[11]+categoryAgeFilterArray[5]+'])';
+
+     getMappedFormulaValuePercentage(analyticsURL,Measles0to11MaleFormula ,'#Measles0to11Male');
+     getMappedFormulaValuePercentage(analyticsURL,Measles1to4MaleFormula ,'#Measles1to4Male');
+     getMappedFormulaValuePercentage(analyticsURL,Measles5to14MaleFormula ,'#Measles5to14Male');
+     getMappedFormulaValuePercentage(analyticsURL,Measles15to49MaleFormula ,'#Measles15to49Male');
+     getMappedFormulaValuePercentage(analyticsURL,Measles50to60MaleFormula ,'#Measles50to60Male');
+     getMappedFormulaValuePercentage(analyticsURL,MeaslesAbove60MaleFormula ,'#MeaslesAbove60Male');
+
+     getMappedFormulaValuePercentage(analyticsURL,Measles0to11FemaleFormula ,'#Measles0to11Female');
+     getMappedFormulaValuePercentage(analyticsURL,Measles1to4FemaleFormula ,'#Measles1to4Female');
+     getMappedFormulaValuePercentage(analyticsURL,Measles5to14FemaleFormula ,'#Measles5to14Female');
+     getMappedFormulaValuePercentage(analyticsURL,Measles15to49FemaleFormula ,'#Measles15to49Female');
+     getMappedFormulaValuePercentage(analyticsURL,Measles50to60FemaleFormula ,'#Measles50to60Female');
+     getMappedFormulaValuePercentage(analyticsURL,MeaslesAbove60FemaleFormula ,'#MeaslesAbove60Female');
+
+     getMappedFormulaValuePercentage(analyticsURL,Measles0to11TotalFormula ,'#Measles0to11Total');
+     getMappedFormulaValuePercentage(analyticsURL,Measles1to4TotalFormula ,'#Measles1to4Total');
+     getMappedFormulaValuePercentage(analyticsURL,Measles5to14TotalFormula ,'#Measles5to14Total');
+     getMappedFormulaValuePercentage(analyticsURL,Measles15to49TotalFormula ,'#Measles15to49Total');
+     getMappedFormulaValuePercentage(analyticsURL,Measles50to60TotalFormula ,'#Measles50to60Total');
+     getMappedFormulaValuePercentage(analyticsURL,MeaslesAbove60TotalFormula ,'#MeaslesAbove60Total');
+
+     //-------------------------End of case fatality rate for measles, by sex and age section mapping-----//
+
+
+
+    //-----------------Incidence and prevalence of chronic and... disaggregated by sex and age section mapping--------------------------------//
+
+    var DEChronicValuesArray =new Array(10);
+
+    DEChronicValuesArray[0]='&dimension=dx:SL0ZKVE7w8Z';   //AsthmaFollowUp
+    DEChronicValuesArray[1]='&dimension=dx:B91TcnXWeam';   //AsthmaNew
+    DEChronicValuesArray[2]='&dimension=dx:NYZmXxejBOu';   //HypertensionFollowUp
+    DEChronicValuesArray[3]='&dimension=dx:xuNBoJNgN6f';   //HypertensionNew
+    DEChronicValuesArray[4]='&dimension=dx:ZiLZKx35oXf';   //Myocardial ischemia FollowUp
+    DEChronicValuesArray[5]='&dimension=dx:vlXyVTDaS4N';   //Myocardial ischemia New
+    DEChronicValuesArray[6]='&dimension=dx:NgdG6a7uXxB';   //Congestive heart disease FollowUp
+    DEChronicValuesArray[7]='&dimension=dx:wOPljcxDaTM';   //Congestive heart disease New
+    DEChronicValuesArray[8]='&dimension=dx:IOswN5TC8CS';   //DiabetesFollowUp
+    DEChronicValuesArray[9]='&dimension=dx:iMRuVsU3eka';   //DiabetesNew
+
+
+
+    var ChronicMale0to11formula="(";
+    for(var i=0;i<10;i++){
+        ChronicMale0to11formula+="["+DEChronicValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+"]+";
+    }
+    ChronicMale0to11formula=ChronicMale0to11formula.substring(0,ChronicMale0to11formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicMale0to11formula+'/'+TotalMale0to11formula,'#Trauma0to11Male');
+
+    var ChronicMale1to4formula="(";
+    for(var i=0;i<10;i++){
+        ChronicMale1to4formula+="["+DEChronicValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+"]+";
+    }
+    ChronicMale1to4formula=ChronicMale1to4formula.substring(0,ChronicMale1to4formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicMale1to4formula+'/'+TotalMale1to4formula,'#Trauma1to4Male');
+
+    var ChronicMale5to14formula="(";
+    for(var i=0;i<10;i++){
+        ChronicMale5to14formula+="["+DEChronicValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+"]+";
+    }
+    ChronicMale5to14formula=ChronicMale5to14formula.substring(0,ChronicMale5to14formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicMale5to14formula+'/'+TotalMale5to14formula,'#Trauma5to14Male');
+
+    var ChronicMale15to49formula="(";
+    for(var i=0;i<10;i++){
+        ChronicMale15to49formula+="["+DEChronicValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+"]+";
+    }
+    ChronicMale15to49formula=ChronicMale15to49formula.substring(0,ChronicMale15to49formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicMale15to49formula+'/'+TotalMale15to49formula,'#Trauma15to49Male');
+
+    var ChronicMale50to60formula="(";
+    for(var i=0;i<10;i++){
+        ChronicMale50to60formula+="["+DEChronicValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+"]+";
+    }
+    ChronicMale50to60formula=ChronicMale50to60formula.substring(0,ChronicMale50to60formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicMale50to60formula+'/'+TotalMale50to60formula,'#Trauma50to60Male');
+
+    var ChronicMaleAbove60formula="(";
+    for(var i=0;i<10;i++){
+        ChronicMaleAbove60formula+="["+DEChronicValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+"]+";
+    }
+    ChronicMaleAbove60formula=ChronicMaleAbove60formula.substring(0,ChronicMaleAbove60formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicMaleAbove60formula+'/'+TotalMaleAbove60formula,'#TraumaAbove60Male');
+
+    var ChronicFemale0to11formula="(";
+    for(var i=0;i<10;i++){
+        ChronicFemale0to11formula+="["+DEChronicValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+"]+";
+    }
+    ChronicFemale0to11formula=ChronicFemale0to11formula.substring(0,ChronicFemale0to11formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicFemale0to11formula+'/'+TotalFemale0to11formula,'#Trauma0to11Female');
+
+    var ChronicFemale1to4formula="(";
+    for(var i=0;i<10;i++){
+        ChronicFemale1to4formula+="["+DEChronicValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+"]+";
+    }
+    ChronicFemale1to4formula=ChronicFemale1to4formula.substring(0,ChronicFemale1to4formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicFemale1to4formula+'/'+TotalFemale1to4formula,'#Trauma1to4Female');
+
+    var ChronicFemale5to14formula="(";
+    for(var i=0;i<10;i++){
+        ChronicFemale5to14formula+="["+DEChronicValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+"]+";
+    }
+    ChronicFemale5to14formula=ChronicFemale5to14formula.substring(0,ChronicFemale5to14formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicFemale5to14formula+'/'+TotalFemale5to14formula,'#Trauma5to14Female');
+
+    var ChronicFemale15to49formula="(";
+    for(var i=0;i<10;i++){
+        ChronicFemale15to49formula+="["+DEChronicValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+"]+";
+    }
+    ChronicFemale15to49formula=ChronicFemale15to49formula.substring(0,ChronicFemale15to49formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicFemale15to49formula+'/'+TotalFemale15to49formula,'#Trauma15to49Female');
+
+    var ChronicFemale50to60formula="(";
+    for(var i=0;i<10;i++){
+        ChronicFemale50to60formula+="["+DEChronicValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+"]+";
+    }
+    ChronicFemale50to60formula=ChronicFemale50to60formula.substring(0,ChronicFemale50to60formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicFemale50to60formula+'/'+TotalFemale50to60formula,'#Trauma50to60Female');
+
+    var ChronicFemaleAbove60formula="(";
+    for(var i=0;i<10;i++){
+        ChronicFemaleAbove60formula+="["+DEChronicValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+"]+";
+    }
+    ChronicFemaleAbove60formula=ChronicFemaleAbove60formula.substring(0,ChronicFemaleAbove60formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicFemaleAbove60formula+'/'+TotalFemaleAbove60formula,'#TraumaAbove60Female');
+
+    var ChronicTotal0to11formula="(";
+    for(var i=0;i<10;i++){
+        ChronicTotal0to11formula+="["+DEChronicValuesArray[i]+categoryAgeFilterArray[0]+"]+";
+    }
+    ChronicTotal0to11formula=ChronicTotal0to11formula.substring(0,ChronicTotal0to11formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicTotal0to11formula+'/'+TotalTotal0to11formula,'#Trauma0to11Total');
+
+    var ChronicTotal1to4formula="(";
+    for(var i=0;i<10;i++){
+        ChronicTotal1to4formula+="["+DEChronicValuesArray[i]+categoryAgeFilterArray[1]+"]+";
+    }
+    ChronicTotal1to4formula=ChronicTotal1to4formula.substring(0,ChronicTotal1to4formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicTotal1to4formula+'/'+TotalTotal1to4formula,'#Trauma1to4Total');
+
+    var ChronicTotal5to14formula="(";
+    for(var i=0;i<10;i++){
+        ChronicTotal5to14formula+="["+DEChronicValuesArray[i]+categoryAgeFilterArray[2]+"]+";
+    }
+    ChronicTotal5to14formula=ChronicTotal5to14formula.substring(0,ChronicTotal5to14formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicTotal5to14formula+'/'+TotalTotal5to14formula,'#Trauma5to14Total');
+
+    var ChronicTotal15to49formula="(";
+    for(var i=0;i<10;i++){
+        ChronicTotal15to49formula+="["+DEChronicValuesArray[i]+categoryAgeFilterArray[3]+"]+";
+    }
+    ChronicTotal15to49formula=ChronicTotal15to49formula.substring(0,ChronicTotal15to49formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicTotal15to49formula+'/'+TotalTotal15to49formula,'#Trauma15to49Total');
+
+    var ChronicTotal50to60formula="(";
+    for(var i=0;i<10;i++){
+        ChronicTotal50to60formula+="["+DEChronicValuesArray[i]+categoryAgeFilterArray[4]+"]+";
+    }
+    ChronicTotal50to60formula=ChronicTotal50to60formula.substring(0,ChronicTotal50to60formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicTotal50to60formula+'/'+TotalTotal50to60formula,'#Trauma50to60Total');
+
+    var ChronicTotalAbove60formula="(";
+    for(var i=0;i<10;i++){
+        ChronicTotalAbove60formula+="["+DEChronicValuesArray[i]+categoryAgeFilterArray[5]+"]+";
+    }
+    ChronicTotalAbove60formula=ChronicTotalAbove60formula.substring(0,ChronicTotalAbove60formula.length-1)+')';
+    getMappedFormulaValuePercentage(analyticsURL,ChronicTotalAbove60formula+'/'+TotalTotalAbove60formula,'#TraumaAbove60Total');
+
+    //-----------------End of Incidence and prevalence of chronic and... disaggregated by sex and age section mapping--------------------------------//
+
+    //-----------------Number and percentage of people treated for mass-casualty or violence-related injuries, disaggregated by sex and age**--------------------------------//
+
+    var DEConflictValuesArray =new Array(10);
+
+    DEConflictValuesArray[0]='&dimension=dx:pBYHiJ5RamT';   //Chemical-Biological Agent (conflict)FollowUp
+    DEConflictValuesArray[1]='&dimension=dx:rmdxXIuOAQD';   //Chemical-Biological Agent (conflict)New
+    DEConflictValuesArray[2]='&dimension=dx:SXDIXHMzalv';   //Gunshot Wound (conflict)FollowUp
+    DEConflictValuesArray[3]='&dimension=dx:dQE5eEAW0UN';   //Gunshot Wound (conflict)New
+    DEConflictValuesArray[4]='&dimension=dx:f5occrtU5j5';  //Burn (conflict)FollowUp
+    DEConflictValuesArray[5]='&dimension=dx:tOARcNRJ0vQ';  //Burn (conflict)New
+    DEConflictValuesArray[6]='&dimension=dx:BNLQJi4YAxb';  //Traumatic Amputation (conflict)FollowUp
+    DEConflictValuesArray[7]='&dimension=dx:MP6d8EdS2k2';  //Traumatic Amputation (conflict)New
+    DEConflictValuesArray[8]='&dimension=dx:lAD8AqgwjIe';  //Other Conflict Related InjuryFollowUp
+    DEConflictValuesArray[9]='&dimension=dx:ZzqmMtne7eE';  //Other Conflict Related InjuryNew
+
+    var ConflictMale0to11formula="(";
+    for(var i=0;i<10;i++){
+        ConflictMale0to11formula+="["+DEConflictValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+"]+";
+    }
+    ConflictMale0to11formula=ConflictMale0to11formula.substring(0,ConflictMale0to11formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictMale0to11formula ,'#Mass0to11MaleNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictMale0to11formula+'/'+TotalMale0to11formula,'#Mass0to11MalePercentage');
+
+    var ConflictMale1to4formula="(";
+    for(var i=0;i<10;i++){
+        ConflictMale1to4formula+="["+DEConflictValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+"]+";
+    }
+    ConflictMale1to4formula=ConflictMale1to4formula.substring(0,ConflictMale1to4formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictMale1to4formula ,'#Mass1to4MaleNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictMale1to4formula+'/'+TotalMale1to4formula,'#Mass1to4MalePercentage');
+
+    var ConflictMale5to14formula="(";
+    for(var i=0;i<10;i++){
+        ConflictMale5to14formula+="["+DEConflictValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+"]+";
+    }
+    ConflictMale5to14formula=ConflictMale5to14formula.substring(0,ConflictMale5to14formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictMale5to14formula ,'#Mass5to14MaleNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictMale5to14formula+'/'+TotalMale5to14formula,'#Mass5to14MalePercentage');
+
+    var ConflictMale15to49formula="(";
+    for(var i=0;i<10;i++){
+        ConflictMale15to49formula+="["+DEConflictValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+"]+";
+    }
+    ConflictMale15to49formula=ConflictMale15to49formula.substring(0,ConflictMale15to49formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictMale15to49formula ,'#Mass15to49MaleNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictMale15to49formula+'/'+TotalMale15to49formula,'#Mass15to49MalePercentage');
+
+    var ConflictMale50to60formula="(";
+    for(var i=0;i<10;i++){
+        ConflictMale50to60formula+="["+DEConflictValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+"]+";
+    }
+    ConflictMale50to60formula=ConflictMale50to60formula.substring(0,ConflictMale50to60formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictMale50to60formula ,'#Mass50to60MaleNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictMale50to60formula+'/'+TotalMale50to60formula,'#Mass50to60MalePercentage');
+
+    var ConflictMaleAbove60formula="(";
+    for(var i=0;i<10;i++){
+        ConflictMaleAbove60formula+="["+DEConflictValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+"]+";
+    }
+    ConflictMaleAbove60formula=ConflictMaleAbove60formula.substring(0,ConflictMaleAbove60formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictMaleAbove60formula ,'#MassAbove60MaleNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictMaleAbove60formula+'/'+TotalMaleAbove60formula,'#MassAbove60MalePercentage');
+
+    var ConflictFemale0to11formula="(";
+    for(var i=0;i<10;i++){
+        ConflictFemale0to11formula+="["+DEConflictValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+"]+";
+    }
+    ConflictFemale0to11formula=ConflictFemale0to11formula.substring(0,ConflictFemale0to11formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictFemale0to11formula ,'#Mass0to11FemaleNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictFemale0to11formula+'/'+TotalFemale0to11formula,'#Mass0to11FemalePercentage');
+
+    var ConflictFemale1to4formula="(";
+    for(var i=0;i<10;i++){
+        ConflictFemale1to4formula+="["+DEConflictValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+"]+";
+    }
+    ConflictFemale1to4formula=ConflictFemale1to4formula.substring(0,ConflictFemale1to4formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictFemale1to4formula ,'#Mass1to4FemaleNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictFemale1to4formula+'/'+TotalFemale1to4formula,'#Mass1to4FemalePercentage');
+
+    var ConflictFemale5to14formula="(";
+    for(var i=0;i<10;i++){
+        ConflictFemale5to14formula+="["+DEConflictValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+"]+";
+    }
+    ConflictFemale5to14formula=ConflictFemale5to14formula.substring(0,ConflictFemale5to14formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictFemale5to14formula ,'#Mass5to14FemaleNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictFemale5to14formula+'/'+TotalFemale5to14formula,'#Mass5to14FemalePercentage');
+
+    var ConflictFemale15to49formula="(";
+    for(var i=0;i<10;i++){
+        ConflictFemale15to49formula+="["+DEConflictValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+"]+";
+    }
+    ConflictFemale15to49formula=ConflictFemale15to49formula.substring(0,ConflictFemale15to49formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictFemale15to49formula ,'#Mass15to49FemaleNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictFemale15to49formula+'/'+TotalFemale15to49formula,'#Mass15to49FemalePercentage');
+
+    var ConflictFemale50to60formula="(";
+    for(var i=0;i<10;i++){
+        ConflictFemale50to60formula+="["+DEConflictValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+"]+";
+    }
+    ConflictFemale50to60formula=ConflictFemale50to60formula.substring(0,ConflictFemale50to60formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictFemale50to60formula ,'#Mass50to60FemaleNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictFemale50to60formula+'/'+TotalFemale50to60formula,'#Mass50to60FemalePercentage');
+
+    var ConflictFemaleAbove60formula="(";
+    for(var i=0;i<10;i++){
+        ConflictFemaleAbove60formula+="["+DEConflictValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+"]+";
+    }
+    ConflictFemaleAbove60formula=ConflictFemaleAbove60formula.substring(0,ConflictFemaleAbove60formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictFemaleAbove60formula ,'#MassAbove60FemaleNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictFemaleAbove60formula+'/'+TotalFemaleAbove60formula,'#MassAbove60FemalePercentage');
+
+    var ConflictTotal0to11formula="(";
+    for(var i=0;i<10;i++){
+        ConflictTotal0to11formula+="["+DEConflictValuesArray[i]+categoryAgeFilterArray[0]+"]+";
+    }
+    ConflictTotal0to11formula=ConflictTotal0to11formula.substring(0,ConflictTotal0to11formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictTotal0to11formula ,'#Mass0to11TotalNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictTotal0to11formula+'/'+TotalTotal0to11formula,'#Mass0to11TotalPercentage');
+
+    var ConflictTotal1to4formula="(";
+    for(var i=0;i<10;i++){
+        ConflictTotal1to4formula+="["+DEConflictValuesArray[i]+categoryAgeFilterArray[1]+"]+";
+    }
+    ConflictTotal1to4formula=ConflictTotal1to4formula.substring(0,ConflictTotal1to4formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictTotal1to4formula ,'#Mass1to4TotalNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictTotal1to4formula+'/'+TotalTotal1to4formula,'#Mass1to4TotalPercentage');
+
+    var ConflictTotal5to14formula="(";
+    for(var i=0;i<10;i++){
+        ConflictTotal5to14formula+="["+DEConflictValuesArray[i]+categoryAgeFilterArray[2]+"]+";
+    }
+    ConflictTotal5to14formula=ConflictTotal5to14formula.substring(0,ConflictTotal5to14formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictTotal5to14formula ,'#Mass5to14TotalNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictTotal5to14formula+'/'+TotalTotal5to14formula,'#Mass5to14TotalPercentage');
+
+    var ConflictTotal15to49formula="(";
+    for(var i=0;i<10;i++){
+        ConflictTotal15to49formula+="["+DEConflictValuesArray[i]+categoryAgeFilterArray[3]+"]+";
+    }
+    ConflictTotal15to49formula=ConflictTotal15to49formula.substring(0,ConflictTotal15to49formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictTotal15to49formula ,'#Mass15to49TotalNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictTotal15to49formula+'/'+TotalTotal15to49formula,'#Mass15to49TotalPercentage');
+
+    var ConflictTotal50to60formula="(";
+    for(var i=0;i<10;i++){
+        ConflictTotal50to60formula+="["+DEConflictValuesArray[i]+categoryAgeFilterArray[4]+"]+";
+    }
+    ConflictTotal50to60formula=ConflictTotal50to60formula.substring(0,ConflictTotal50to60formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictTotal50to60formula ,'#Mass50to60TotalNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictTotal50to60formula+'/'+TotalTotal50to60formula,'#Mass50to60TotalPercentage');
+
+    var ConflictTotalAbove60formula="(";
+    for(var i=0;i<10;i++){
+        ConflictTotalAbove60formula+="["+DEConflictValuesArray[i]+categoryAgeFilterArray[5]+"]+";
+    }
+    ConflictTotalAbove60formula=ConflictTotalAbove60formula.substring(0,ConflictTotalAbove60formula.length-1)+')';
+    getMappedFormulaValue(analyticsURL,ConflictTotalAbove60formula ,'#MassAbove60TotalNumber');
+    getMappedFormulaValuePercentage(analyticsURL,ConflictTotalAbove60formula+'/'+TotalTotalAbove60formula,'#MassAbove60TotalPercentage');
+
+    reportNotNull=returnReportStatus();
+
+
+    //-----------------End of Number and percentage of people treated for mass-casualty or violence-related injuries, disaggregated by sex and age**----------------------------//
+}
+
+$(document).ready(function () {
+    reportNotNull=false;
+    document.getElementById('noValues').style.display='none';
+    document.getElementById('reportInside').style.display='none';
+    document.getElementById('head').style.display='block';
+
+    reportLogic();
+    $("#btnExport").click(function (e) {
+        tableToExcel('tableContainer', 'Consultation Indicator Report');
+        e.preventDefault();
+    });
+    $("#btnBack").click(function (e) {
+        reportNotNull=false;
+        window.history.go(-1);
+    });
+    $("#btnBack2").click(function (e) {
+        reportNotNull=false;
+        window.history.go(-1);
+    });
+    $("#btnHome").click(function (e) {
+        var hrefURL=dhisBaseURL.substring(0,dhisBaseURL.length-3);
+        window.location.href = hrefURL+'dhis-web-dashboard-integration/index.action';
+    });
+    $("#btnPrint").click(function (e) {
+        var headstr = "<html><head><title></title></head><body>";
+        var footstr = "</body>";
+        var reportName=document.getElementById('reportName').innerHTML;
+        var newstr = document.all.item('tableContainer').innerHTML;
+        var oldstr = document.body.innerHTML;
+        document.body.innerHTML = headstr+reportName+newstr+footstr;
+        window.print();
+        document.body.innerHTML = oldstr;
+    });
+    if(reportNotNull){
+        document.getElementById('head').style.display='none';
+        document.getElementById('reportInside').style.display='block';
+    }
+    else{
+        document.getElementById('head').style.display='none';
+        document.getElementById('noValues').style.display='block';
+    }
+});
+
+
+
+</script>
+
+
+</head>
+<body id="pageBody">
+<div id="navigation" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            <img src="assets/img/news.png" width="35px" height="35px">
+                            &NonBreakingSpace;
+                            <b>[Custom-Reports]</b>
+                        </a>
+                        <label>
+                            <span class="navbar-fixed-top" id="btnHome" style="padding-left:90%; padding-top: 20px">
+                                <div class="label btn-primary">&nbsp;&nbsp;Home&nbsp;&nbsp;</div>
+                            </span>
+                        </label>
+                    </span>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav"></ul>
+        </div>
+    </div>
+</div>
+<div class="container" id="head" style="padding-top: 20%">
+    <div style="margin:auto;text-align: center">Report is Loading...</div>
+    <div class="progress progress-striped active" id="cover">
+        <div class="progress-bar progress-bar-info"
+             role="progressbar"
+             aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+             style="width: 100%;">
+        </div>
+    </div>
+</div>
+<div class="container" id="page" style="padding-top: 60px">
+
+<div class="container" id="reportInside">
+<div class="row">
+    <div class="col-md-8" id="reportName">
+        <label><span class="label label-primary">Consultation Indicator Report</span></label>
+    </div>
+    <div class="col-md-2">
+        <div style="float: left"><label><span class="label btn-success" id="btnBack">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+    </div>
+    <div class="col-md-1">
+        <div style="float: right"><label><span class="label btn-success" id="btnExport">&nbsp;Export to Excel&nbsp;</span></label></div>
+    </div>
+    <div class="col-md-1">
+        <div style="float: left"><label><span class="label btn-success" id="btnPrint">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="col-md-12" id="tableContainer" style="padding-top: 20px">
+        <div class="col-md-6"  id="reportTags"></div>
+        <div class="col-md-6"></div>
+        <table class="bordered" id="MorbidityIndicators">
+            <tr>
+                <th rowspan="3"></td>
+                <th colspan="3">Number of consultations, by sex and age</th>
+                <th colspan="3">case fatality rate for diarrhea, by sex and age</th>
+                <th colspan="3">case fatality rate for ARI by sex and age</th>
+                <th colspan="3">case fatality rate for measles, by sex and age</th>
+                <th colspan="3">Incidence and prevalence of chronic and other diseases (e.g., trauma), disaggregated by sex and age* (Proportionate morbidities)</th>
+                <th colspan="6">Number and percentage of people treated for mass-casualty or violence-related injuries, disaggregated by sex and age**</th>
+            </tr>
+            <tr>
+                <th rowspan="2">Male</th>
+                <th rowspan="2">Female</th>
+                <th rowspan="2">Total</th>
+                <th rowspan="2">Male</th>
+                <th rowspan="2">Female</th>
+                <th rowspan="2">Total</th>
+                <th rowspan="2">Male</th>
+                <th rowspan="2">Female</th>
+                <th rowspan="2">Total</th>
+                <th rowspan="2">Male</th>
+                <th rowspan="2">Female</th>
+                <th rowspan="2">Total</th>
+                <th rowspan="2">Male</th>
+                <th rowspan="2">Female</th>
+                <th rowspan="2">Total</th>
+                <th colspan="2">Male</th>
+                <th colspan="2">Female</th>
+                <th colspan="2">Total</th>
+            </tr>
+            <tr>
+                <th>Number</th>
+                <th>Percentage</th>
+                <th>Number</th>
+                <th>Percentage</th>
+                <th>Number</th>
+                <th>Percentage</th>
+            </tr>
+            <tr>
+                <td>0 - 11 mos</td>
+                <td id="Consultations0to11Male"></td>
+                <td id="Consultations0to11Female"></td>
+                <td id="Consultations0to11Total"></td>
+                <td id="Diarrhea0to11Male"></td>
+                <td id="Diarrhea0to11Female"></td>
+                <td id="Diarrhea0to11Total"></td>
+                <td id="ARI0to11Male"></td>
+                <td id="ARI0to11Female"></td>
+                <td id="ARI0to11Total"></td>
+                <td id="Measles0to11Male"></td>
+                <td id="Measles0to11Female"></td>
+                <td id="Measles0to11Total"></td>
+                <td id="Trauma0to11Male"></td>
+                <td id="Trauma0to11Female"></td>
+                <td id="Trauma0to11Total"></td>
+                <td id="Mass0to11MaleNumber"></td>
+                <td id="Mass0to11MalePercentage"></td>
+                <td id="Mass0to11FemaleNumber"></td>
+                <td id="Mass0to11FemalePercentage"></td>
+                <td id="Mass0to11TotalNumber"></td>
+                <td id="Mass0to11TotalPercentage"></td>
+            </tr>
+            <tr>
+                <td>1 - 4 years</td>
+                <td id="Consultations1to4Male"></td>
+                <td id="Consultations1to4Female"></td>
+                <td id="Consultations1to4Total"></td>
+                <td id="Diarrhea1to4Male"></td>
+                <td id="Diarrhea1to4Female"></td>
+                <td id="Diarrhea1to4Total"></td>
+                <td id="ARI1to4Male"></td>
+                <td id="ARI1to4Female"></td>
+                <td id="ARI1to4Total"></td>
+                <td id="Measles1to4Male"></td>
+                <td id="Measles1to4Female"></td>
+                <td id="Measles1to4Total"></td>
+                <td id="Trauma1to4Male"></td>
+                <td id="Trauma1to4Female"></td>
+                <td id="Trauma1to4Total"></td>
+                <td id="Mass1to4MaleNumber"></td>
+                <td id="Mass1to4MalePercentage"></td>
+                <td id="Mass1to4FemaleNumber"></td>
+                <td id="Mass1to4FemalePercentage"></td>
+                <td id="Mass1to4TotalNumber"></td>
+                <td id="Mass1to4TotalPercentage"></td>
+            </tr>
+            <tr>
+                <td>5 - 14 years</td>
+                <td id="Consultations5to14Male"></td>
+                <td id="Consultations5to14Female"></td>
+                <td id="Consultations5to14Total"></td>
+                <td id="Diarrhea5to14Male"></td>
+                <td id="Diarrhea5to14Female"></td>
+                <td id="Diarrhea5to14Total"></td>
+                <td id="ARI5to14Male"></td>
+                <td id="ARI5to14Female"></td>
+                <td id="ARI5to14Total"></td>
+                <td id="Measles5to14Male"></td>
+                <td id="Measles5to14Female"></td>
+                <td id="Measles5to14Total"></td>
+                <td id="Trauma5to14Male"></td>
+                <td id="Trauma5to14Female"></td>
+                <td id="Trauma5to14Total"></td>
+                <td id="Mass5to14MaleNumber"></td>
+                <td id="Mass5to14MalePercentage"></td>
+                <td id="Mass5to14FemaleNumber"></td>
+                <td id="Mass5to14FemalePercentage"></td>
+                <td id="Mass5to14TotalNumber"></td>
+                <td id="Mass5to14TotalPercentage"></td>
+            </tr>
+            <tr>
+                <td>15 - 49 years</td>
+                <td id="Consultations15to49Male"></td>
+                <td id="Consultations15to49Female"></td>
+                <td id="Consultations15to49Total"></td>
+                <td id="Diarrhea15to49Male"></td>
+                <td id="Diarrhea15to49Female"></td>
+                <td id="Diarrhea15to49Total"></td>
+                <td id="ARI15to49Male"></td>
+                <td id="ARI15to49Female"></td>
+                <td id="ARI15to49Total"></td>
+                <td id="Measles15to49Male"></td>
+                <td id="Measles15to49Female"></td>
+                <td id="Measles15to49Total"></td>
+                <td id="Trauma15to49Male"></td>
+                <td id="Trauma15to49Female"></td>
+                <td id="Trauma15to49Total"></td>
+                <td id="Mass15to49MaleNumber"></td>
+                <td id="Mass15to49MalePercentage"></td>
+                <td id="Mass15to49FemaleNumber"></td>
+                <td id="Mass15to49FemalePercentage"></td>
+                <td id="Mass15to49TotalNumber"></td>
+                <td id="Mass15to49TotalPercentage"></td>
+            </tr>
+            <tr>
+                <td>50 - 60 years</td>
+                <td id="Consultations50to60Male"></td>
+                <td id="Consultations50to60Female"></td>
+                <td id="Consultations50to60Total"></td>
+                <td id="Diarrhea50to60Male"></td>
+                <td id="Diarrhea50to60Female"></td>
+                <td id="Diarrhea50to60Total"></td>
+                <td id="ARI50to60Male"></td>
+                <td id="ARI50to60Female"></td>
+                <td id="ARI50to60Total"></td>
+                <td id="Measles50to60Male"></td>
+                <td id="Measles50to60Female"></td>
+                <td id="Measles50to60Total"></td>
+                <td id="Trauma50to60Male"></td>
+                <td id="Trauma50to60Female"></td>
+                <td id="Trauma50to60Total"></td>
+                <td id="Mass50to60MaleNumber"></td>
+                <td id="Mass50to60MalePercentage"></td>
+                <td id="Mass50to60FemaleNumber"></td>
+                <td id="Mass50to60FemalePercentage"></td>
+                <td id="Mass50to60TotalNumber"></td>
+                <td id="Mass50to60TotalPercentage"></td>
+            </tr>
+            <tr>
+                <td>60+ years</td>
+                <td id="ConsultationsAbove60Male"></td>
+                <td id="ConsultationsAbove60Female"></td>
+                <td id="ConsultationsAbove60Total"></td>
+                <td id="DiarrheaAbove60Male"></td>
+                <td id="DiarrheaAbove60Female"></td>
+                <td id="DiarrheaAbove60Total"></td>
+                <td id="ARIAbove60Male"></td>
+                <td id="ARIAbove60Female"></td>
+                <td id="ARIAbove60Total"></td>
+                <td id="MeaslesAbove60Male"></td>
+                <td id="MeaslesAbove60Female"></td>
+                <td id="MeaslesAbove60Total"></td>
+                <td id="TraumaAbove60Male"></td>
+                <td id="TraumaAbove60Female"></td>
+                <td id="TraumaAbove60Total"></td>
+                <td id="MassAbove60MaleNumber"></td>
+                <td id="MassAbove60MalePercentage"></td>
+                <td id="MassAbove60FemaleNumber"></td>
+                <td id="MassAbove60FemalePercentage"></td>
+                <td id="MassAbove60TotalNumber"></td>
+                <td id="MassAbove60TotalPercentage"></td>
+            </tr>
+        </table>
+        <br>
+    </div>
+</div>
+</div>
+</div>
+
+
+<div id="noValues" style="padding-top: 5%">
+    <div class="row">
+        <div class="col-md-5"></div>
+        <div class="col-md-2"> <img src="assets/img/noValues.png"> </div>
+        <div class="col-md-5"></div>
+    </div>
+    <h1 style="text-align: center">No values found. Please change report parameters.</h1><br>
+    <div class="row">
+        <div class="col-md-5"></div>
+        <div class="col-md-2">
+            <div style="float: left"><label><span class="label btn-success" id="btnBack2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+        </div>
+        <div class="col-md-5"></div>
+    </div>
+</div>
+</body>
+</html>

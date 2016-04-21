@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="IMC Custom Reporting App">
+		<meta name="author" content="Gaurav<gaurav08021@gmail.com>">
+		<link rel="shortcut icon" href="assets/ico/favicon.png">
+		
+		<title>Custom Reports</title>
+		<!-- Bootstrap core CSS -->
+		<link href="assets/css/bootstrap.css" rel="stylesheet">
+		<!-- Jasny Bootstrap-Extension CSS -->
+		<link href="assets/css/jasny-bootstrap.css" rel="stylesheet">
+		<link href="assets/css/bootstrap-select.css" rel="stylesheet">
+		<link href="assets/css/bootstrap-datetimepicker.css" rel="stylesheet">
+		<!-- Custom styles for this template -->
+		<link href="assets/css/main.css" rel="stylesheet">
+		<link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet'
+		type='text/css'>
+		<link href='https://fonts.googleapis.com/css?family=Raleway:400,300,700' rel='stylesheet' type='text/css'>
+		<link href='assets/css/bordered.css' rel='stylesheet' type='text/css'>
+		
+		
+		<script type="text/javascript" src="assets/js/jquery.min.js"></script>
+		<script type="text/javascript" src="assets/js/bootstrap.js"></script>
+		<script type="text/javascript" src="assets/js/jasny-bootstrap.js"></script>
+		<script type="text/javascript" src="assets/js/bootstrap-select.js"></script>
+		<script type="text/javascript" src="assets/js/moment.js"></script>
+		<script type="text/javascript" src="assets/js/bootstrap-datetimepicker.min.js"></script>
+		<script type="text/javascript" src="assets/js/exportExcel.js"></script>
+		<script type="text/javascript" src="assets/js/reportValues.js"></script>
+		
+		<script type="application/javascript">
+			var dhisBaseURL='';
+			
+			var reportLogic = function () {
+				
+				//--------Get all parameters from session memory------//
+				dhisBaseURL = sessionStorage.getItem('dhisBaseURL');
+				var orgUnitName = sessionStorage.getItem('orgUnitName');
+				var startDate = sessionStorage.getItem('startDate');
+				var endDate = sessionStorage.getItem('endDate');
+				var donorName = sessionStorage.getItem('donorName');
+				var impName = sessionStorage.getItem('impName');
+				var orgUnitGroupName = sessionStorage.getItem('orgUnitGroupName');
+				var orgUnitLevelName = sessionStorage.getItem('orgUnitLevelName');
+				var donorCode = sessionStorage.getItem('donorCode');
+				var impCode = sessionStorage.getItem('impCode');
+				var orgUnitGroupCode = sessionStorage.getItem('orgUnitGroupCode');
+				var orgUnitLevelCode = sessionStorage.getItem('orgUnitLevelCode');
+				var orgUnitCode = sessionStorage.getItem('orgUnitCode');
+				var periodList = sessionStorage.getItem('periodList');
+				//-----------------------------------------------------//
+				
+				
+				var analyticsURL = dhisBaseURL+'/analytics?' + '&dimension=pe:' + periodList;
+				
+				console.log(donorCode);
+				console.log(impCode);
+				console.log(orgUnitGroupCode);
+				console.log(orgUnitLevelCode);
+				console.log(orgUnitCode);
+				console.log(donorCode);
+				console.log(startDate);
+				console.log(endDate);
+				console.log(donorName);
+				console.log(impName);
+				
+				if (orgUnitCode != "") {
+					$('#reportTags').append('<div class="row"></row><label>Org. Unit Name: ' + orgUnitName + '</label></div>');
+					analyticsURL = analyticsURL.concat('&filter=ou:' + orgUnitCode);
+				}
+				else if (orgUnitGroupCode != "") {
+					$('#reportTags').append('<div class="row"><label>Org. Unit Group: ' + orgUnitGroupName + '</label></div>');
+					analyticsURL = analyticsURL.concat('&filter=ou:OU_GROUP-' + orgUnitGroupCode);
+				}
+				else {
+					$('#reportTags').append('<div class="row"><label>Org. Unit Level: ' + orgUnitLevelName + '</label></div>');
+					analyticsURL = analyticsURL.concat('&filter=ou:LEVEL-6');
+				}
+				
+				$('#reportTags').append('<div class="row"><label>' + startDate + ' to ' + endDate + '</label></div>');
+				if (donorCode != "") {
+					$('#reportTags').append('<div class="row"><label>Donor: ' + donorName + '</label></div>');
+					analyticsURL = analyticsURL.concat('&filter=Q3QQy1PWrqe:' + donorCode);
+				}
+				if (impCode != "") {
+					$('#reportTags').append('<div class="row"><label>Implementation Partner: ' + impName + '</label></div>');
+					analyticsURL = analyticsURL.concat('&filter=XkPfFUjhEui:' + impCode);
+				}
+				
+				//-----------------------Arrays for categories-----------------------------------//
+				
+				var categoryGenderFilterArray=new Array(2);
+				categoryGenderFilterArray[0]='&filter=dnTkTGou2TT:QT0Hk38rIoN';//Males
+				categoryGenderFilterArray[1]='&filter=dnTkTGou2TT:K0JjVmoa8kC';//Females
+				
+				var categoryAgeFilterArray=new Array(6);
+				categoryAgeFilterArray[0]='&filter=KPrmQk3MQau:cUkiDwbsNAE';    //0-11
+				categoryAgeFilterArray[1]='&filter=KPrmQk3MQau:baFPsNHckYI';    //1-4
+				categoryAgeFilterArray[2]='&filter=KPrmQk3MQau:mJXz8XMPfod';    //5-14
+				categoryAgeFilterArray[3]='&filter=KPrmQk3MQau:pmt8j58oArW';    //15-49
+				categoryAgeFilterArray[4]='&filter=KPrmQk3MQau:B3DlDpSYQfr';    //50-60
+				categoryAgeFilterArray[5]='&filter=KPrmQk3MQau:QfpbuAqtnRV';    //60+
+				
+				//-----------------------End of Arrays for categories-----------------------------------//
+				
+				//------------------------Total Consultation Row Mapping---------------------------//
+				
+				var morbidityDEArray=new Array();
+				morbidityDEArray[0]='&dimension=dx:wU1SjRePNOQ';
+				morbidityDEArray[1]='&dimension=dx:Stv7TPtz4YP';
+				morbidityDEArray[2]='&dimension=dx:gjjMhbKihSP';
+				morbidityDEArray[3]='&dimension=dx:hiDWXvfAOWV';
+				morbidityDEArray[4]='&dimension=dx:v4wrJN1TAL1';
+				morbidityDEArray[5]='&dimension=dx:mboD1AFRmui';
+				morbidityDEArray[6]='&dimension=dx:ygdLgCupISz';
+				morbidityDEArray[7]='&dimension=dx:LIm58Gv2yLQ';
+				morbidityDEArray[8]='&dimension=dx:xqkJoai9Ub2';
+				morbidityDEArray[9]='&dimension=dx:r9Yq04ubuQr';
+				morbidityDEArray[10]='&dimension=dx:iKUwgCqYMen';
+				morbidityDEArray[11]='&dimension=dx:bpBRZa7xduT';
+				morbidityDEArray[12]='&dimension=dx:wtRMBNKKi6t';
+				morbidityDEArray[13]='&dimension=dx:nMgRu6locfE';
+				morbidityDEArray[14]='&dimension=dx:PMaL5BM4eCi';
+				morbidityDEArray[15]='&dimension=dx:bMdwG64EVhN';
+				morbidityDEArray[16]='&dimension=dx:kRp3dYdnvxs';
+				morbidityDEArray[17]='&dimension=dx:BhqIlnkCYrY';
+				morbidityDEArray[18]='&dimension=dx:qlsObbtey7n';
+				morbidityDEArray[19]='&dimension=dx:hwupv9DYA8k';
+				morbidityDEArray[20]='&dimension=dx:GNpOcrUHjbT';
+				morbidityDEArray[21]='&dimension=dx:iWDzrRCcDLW';
+				morbidityDEArray[22]='&dimension=dx:SL0ZKVE7w8Z';
+				morbidityDEArray[23]='&dimension=dx:NYZmXxejBOu';
+				morbidityDEArray[24]='&dimension=dx:ZiLZKx35oXf';
+				morbidityDEArray[25]='&dimension=dx:NgdG6a7uXxB';
+				morbidityDEArray[26]='&dimension=dx:IOswN5TC8CS';
+				morbidityDEArray[27]='&dimension=dx:pBYHiJ5RamT';
+				morbidityDEArray[28]='&dimension=dx:SXDIXHMzalv';
+				morbidityDEArray[29]='&dimension=dx:f5occrtU5j5';
+				morbidityDEArray[30]='&dimension=dx:BNLQJi4YAxb';
+				morbidityDEArray[31]='&dimension=dx:lAD8AqgwjIe';
+				morbidityDEArray[32]='&dimension=dx:BaUvaLXCCfK';
+				morbidityDEArray[33]='&dimension=dx:QMusE7HZZay';
+				
+				morbidityDEArray[34]='&dimension=dx:lpAQHmctEVb';
+				morbidityDEArray[35]='&dimension=dx:RWz7pZ89oFK';
+				morbidityDEArray[36]='&dimension=dx:Jkf7dzLGkm1';
+				morbidityDEArray[37]='&dimension=dx:rWJpL7rjbBH';
+				morbidityDEArray[38]='&dimension=dx:CJgkFktZcV1';
+				morbidityDEArray[39]='&dimension=dx:da6MNmOIF8w';
+				morbidityDEArray[40]='&dimension=dx:ramZzhx21Bj';
+				morbidityDEArray[41]='&dimension=dx:NNiLfBShj9B';
+				morbidityDEArray[42]='&dimension=dx:j1zkkMnNhSl';
+				morbidityDEArray[43]='&dimension=dx:VERQOpXbPzD';
+				morbidityDEArray[44]='&dimension=dx:Fd6q5LtXOU1';
+				morbidityDEArray[45]='&dimension=dx:h2RnDOxTUdv';
+				morbidityDEArray[46]='&dimension=dx:MRkyN1nb35W';
+				morbidityDEArray[47]='&dimension=dx:Mi6ST2XF4Nw';
+				morbidityDEArray[48]='&dimension=dx:Hz4sg9Ufntu';
+				morbidityDEArray[49]='&dimension=dx:ouZw0qTHGAb';
+				morbidityDEArray[50]='&dimension=dx:VLu1UhDsc3N';
+				morbidityDEArray[51]='&dimension=dx:ZUj7B7oTULC';
+				morbidityDEArray[52]='&dimension=dx:tMCe36hqbYn';
+				morbidityDEArray[53]='&dimension=dx:SvBxnS0vp1H';
+				morbidityDEArray[54]='&dimension=dx:y3TNSEf3pLo';
+				morbidityDEArray[55]='&dimension=dx:sAkiKU9hV5h';
+				morbidityDEArray[56]='&dimension=dx:B91TcnXWeam';
+				morbidityDEArray[57]='&dimension=dx:xuNBoJNgN6f';
+				morbidityDEArray[58]='&dimension=dx:vlXyVTDaS4N';
+				morbidityDEArray[59]='&dimension=dx:wOPljcxDaTM';
+				morbidityDEArray[60]='&dimension=dx:iMRuVsU3eka';
+				morbidityDEArray[61]='&dimension=dx:rmdxXIuOAQD';
+				morbidityDEArray[62]='&dimension=dx:dQE5eEAW0UN';
+				morbidityDEArray[63]='&dimension=dx:tOARcNRJ0vQ';
+				morbidityDEArray[64]='&dimension=dx:MP6d8EdS2k2';
+				morbidityDEArray[65]='&dimension=dx:ZzqmMtne7eE';
+				morbidityDEArray[66]='&dimension=dx:zVfVg1dAQvw';
+				morbidityDEArray[67]='&dimension=dx:t7QmAdLkV0h';
+				
+				
+				var morbidityFormulaFollowUpMaleArray=new Array(6);
+				for(var c=0;c<categoryAgeFilterArray.length;c++){
+					morbidityFormulaFollowUpMaleArray[c]='';
+					for(var d=0;d<34;d++){
+						morbidityFormulaFollowUpMaleArray[c]+='['+morbidityDEArray[d]+categoryGenderFilterArray[0]+categoryAgeFilterArray[c]+']';
+						if(d!=33){
+							morbidityFormulaFollowUpMaleArray[c]+='+';
+						}
+					}
+				}
+				var morbidityFormulaFollowUpMaleSub='';
+				for(var d=0;d<34;d++){
+					morbidityFormulaFollowUpMaleSub+='['+morbidityDEArray[d]+categoryGenderFilterArray[0]+']';
+					if(d!=33){
+						morbidityFormulaFollowUpMaleSub+='+';
+					}
+				}
+				
+				var morbidityFormulaFollowUpFemaleArray=new Array(6);
+				for(var c=0;c<categoryAgeFilterArray.length;c++){
+					morbidityFormulaFollowUpFemaleArray[c]='';
+					for(var d=0;d<34;d++){
+						morbidityFormulaFollowUpFemaleArray[c]+='['+morbidityDEArray[d]+categoryGenderFilterArray[1]+categoryAgeFilterArray[c]+']';
+						if(d!=33){
+							morbidityFormulaFollowUpFemaleArray[c]+='+';
+						}
+					}
+				}
+				
+				var morbidityFormulaFollowUpFemaleSub='';
+				for(var d=0;d<34;d++){
+					morbidityFormulaFollowUpFemaleSub+='['+morbidityDEArray[d]+categoryGenderFilterArray[1]+']';
+					if(d!=33){
+						morbidityFormulaFollowUpFemaleSub+='+';
+					}
+				}
+				
+				var morbidityFormulaFollowUpSub='';
+				for(var d=0;d<34;d++){
+					morbidityFormulaFollowUpSub+='['+morbidityDEArray[d]+']';
+					if(d!=33){
+						morbidityFormulaFollowUpSub+='+';
+					}
+				}
+				
+				var morbidityFormulaNewMaleArray=new Array(6);
+				for(var c=0;c<categoryAgeFilterArray.length;c++){
+					morbidityFormulaNewMaleArray[c]='';
+					for(var d=34;d<68;d++){
+						morbidityFormulaNewMaleArray[c]+='['+morbidityDEArray[d]+categoryGenderFilterArray[0]+categoryAgeFilterArray[c]+']';
+						if(d!=67){
+							morbidityFormulaNewMaleArray[c]+='+';
+						}
+					}
+				}
+				var morbidityFormulaNewMaleSub='';
+				for(var d=34;d<68;d++){
+					morbidityFormulaNewMaleSub+='['+morbidityDEArray[d]+categoryGenderFilterArray[0]+']';
+					if(d!=67){
+						morbidityFormulaNewMaleSub+='+';
+					}
+				}
+				
+				var morbidityFormulaNewFemaleArray=new Array(6);
+				for(var c=0;c<categoryAgeFilterArray.length;c++){
+					morbidityFormulaNewFemaleArray[c]='';
+					for(var d=34;d<68;d++){
+						morbidityFormulaNewFemaleArray[c]+='['+morbidityDEArray[d]+categoryGenderFilterArray[1]+categoryAgeFilterArray[c]+']';
+						if(d!=67){
+							morbidityFormulaNewFemaleArray[c]+='+';
+						}
+					}
+				}
+				
+				var morbidityFormulaNewFemaleSub='';
+				for(var d=34;d<68;d++){
+					morbidityFormulaNewFemaleSub+='['+morbidityDEArray[d]+categoryGenderFilterArray[1]+']';
+					if(d!=67){
+						morbidityFormulaNewFemaleSub+='+';
+					}
+				}
+				
+				var morbidityFormulaNewSub='';
+				for(var d=34;d<68;d++){
+					morbidityFormulaNewSub+='['+morbidityDEArray[d]+']';
+					if(d!=67){
+						morbidityFormulaNewSub+='+';
+					}
+				}
+				
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpMaleArray[0]+'+'+morbidityFormulaNewMaleArray[0] ,'#TotalMale0to11');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpMaleArray[1]+'+'+morbidityFormulaNewMaleArray[1] ,'#TotalMale1to4');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpMaleArray[2]+'+'+morbidityFormulaNewMaleArray[2] ,'#TotalMale5to14');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpMaleArray[3]+'+'+morbidityFormulaNewMaleArray[3] ,'#TotalMale15to49');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpMaleArray[4]+'+'+morbidityFormulaNewMaleArray[4] ,'#TotalMale50to60');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpMaleArray[5]+'+'+morbidityFormulaNewMaleArray[5] ,'#TotalMaleAbove60');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpMaleSub+'+'+morbidityFormulaNewMaleSub ,'#TotalMaleSubTotal');
+				
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpFemaleArray[0]+'+'+morbidityFormulaNewFemaleArray[0] ,'#TotalFemale0to11');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpFemaleArray[1]+'+'+morbidityFormulaNewFemaleArray[1] ,'#TotalFemale1to4');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpFemaleArray[2]+'+'+morbidityFormulaNewFemaleArray[2] ,'#TotalFemale5to14');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpFemaleArray[3]+'+'+morbidityFormulaNewFemaleArray[3] ,'#TotalFemale15to49');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpFemaleArray[4]+'+'+morbidityFormulaNewFemaleArray[4] ,'#TotalFemale50to60');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpFemaleArray[5]+'+'+morbidityFormulaNewFemaleArray[5] ,'#TotalFemaleAbove60');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpFemaleSub+'+'+morbidityFormulaNewFemaleSub ,'#TotalFemaleSubTotal');
+				
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpMaleArray[0]+'+'+morbidityFormulaNewMaleArray[0]+'+'+morbidityFormulaFollowUpFemaleArray[0]+'+'+morbidityFormulaNewFemaleArray[0] ,'#TotalTotal0to11');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpMaleArray[1]+'+'+morbidityFormulaNewMaleArray[1]+'+'+morbidityFormulaFollowUpFemaleArray[1]+'+'+morbidityFormulaNewFemaleArray[1] ,'#TotalTotal1to4');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpMaleArray[2]+'+'+morbidityFormulaNewMaleArray[2]+'+'+morbidityFormulaFollowUpFemaleArray[2]+'+'+morbidityFormulaNewFemaleArray[2] ,'#TotalTotal5to14');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpMaleArray[3]+'+'+morbidityFormulaNewMaleArray[3]+'+'+morbidityFormulaFollowUpFemaleArray[3]+'+'+morbidityFormulaNewFemaleArray[3] ,'#TotalTotal15to49');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpMaleArray[4]+'+'+morbidityFormulaNewMaleArray[4]+'+'+morbidityFormulaFollowUpFemaleArray[4]+'+'+morbidityFormulaNewFemaleArray[4] ,'#TotalTotal50to60');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpMaleArray[5]+'+'+morbidityFormulaNewMaleArray[5]+'+'+morbidityFormulaFollowUpFemaleArray[5]+'+'+morbidityFormulaNewFemaleArray[5] ,'#TotalTotalAbove60');
+				getMappedFormulaValue(analyticsURL, morbidityFormulaFollowUpSub+'+'+morbidityFormulaNewSub ,'#TotalTotalSubTotal');
+				
+				
+				//------------------------End of Total Consultation Row Mapping---------------------------//
+				
+				
+				
+				var formula="";
+				
+				
+				//-----------------Chronic Row Mapping--------------------------------//
+				
+				
+				var DEChronicValuesArray =new Array(10);
+				
+				DEChronicValuesArray[0]='&dimension=dx:SL0ZKVE7w8Z';   //AsthmaFollowUp
+				DEChronicValuesArray[1]='&dimension=dx:B91TcnXWeam';   //AsthmaNew
+				DEChronicValuesArray[2]='&dimension=dx:NYZmXxejBOu';   //HypertensionFollowUp
+				DEChronicValuesArray[3]='&dimension=dx:xuNBoJNgN6f';   //HypertensionNew
+				DEChronicValuesArray[4]='&dimension=dx:ZiLZKx35oXf';   //Myocardial ischemia FollowUp
+				DEChronicValuesArray[5]='&dimension=dx:vlXyVTDaS4N';   //Myocardial ischemia New
+				DEChronicValuesArray[6]='&dimension=dx:NgdG6a7uXxB';   //Congestive heart disease FollowUp
+				DEChronicValuesArray[7]='&dimension=dx:wOPljcxDaTM';   //Congestive heart disease New
+				DEChronicValuesArray[8]='&dimension=dx:IOswN5TC8CS';   //DiabetesFollowUp
+				DEChronicValuesArray[9]='&dimension=dx:iMRuVsU3eka';   //DiabetesNew
+				
+				
+				var formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicMale0to11');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicMale1to4');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicMale5to14');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicMale15to49');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicMale50to60');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicMaleAbove60');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryGenderFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicMaleSubTotal');
+				
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicFemale0to11');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicFemale1to4');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicFemale5to14');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicFemale15to49');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicFemale50to60');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicFemaleAbove60');
+				
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryGenderFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicFemaleSubTotal');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicTotal0to11');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicTotal1to4');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicTotal5to14');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicTotal15to49');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicTotal50to60');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicTotalAbove60');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEChronicValuesArray[i]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ChronicTotalSubTotal');
+				
+				//-----------------End of Chronic Row Mapping--------------------------------//
+				
+				
+				//-----------------Conflict Row Mapping--------------------------------//
+				
+				var DEConflictValuesArray =new Array(10);
+				
+				DEConflictValuesArray[0]='&dimension=dx:pBYHiJ5RamT';   //Chemical-Biological Agent (conflict)FollowUp
+				DEConflictValuesArray[1]='&dimension=dx:rmdxXIuOAQD';   //Chemical-Biological Agent (conflict)New
+				DEConflictValuesArray[2]='&dimension=dx:SXDIXHMzalv';   //Gunshot Wound (conflict)FollowUp
+				DEConflictValuesArray[3]='&dimension=dx:dQE5eEAW0UN';   //Gunshot Wound (conflict)New
+				DEConflictValuesArray[4]='&dimension=dx:f5occrtU5j5';  //Burn (conflict)FollowUp
+				DEConflictValuesArray[5]='&dimension=dx:tOARcNRJ0vQ';  //Burn (conflict)New
+				DEConflictValuesArray[6]='&dimension=dx:BNLQJi4YAxb';  //Traumatic Amputation (conflict)FollowUp
+				DEConflictValuesArray[7]='&dimension=dx:MP6d8EdS2k2';  //Traumatic Amputation (conflict)New
+				DEConflictValuesArray[8]='&dimension=dx:lAD8AqgwjIe';  //Other Conflict Related InjuryFollowUp
+				DEConflictValuesArray[9]='&dimension=dx:ZzqmMtne7eE';  //Other Conflict Related InjuryNew
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictMale0to11');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictMale1to4');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictMale5to14');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictMale15to49');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictMale50to60');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictMaleAbove60');
+				
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryGenderFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictMaleSubTotal');
+				
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictFemale0to11');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictFemale1to4');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictFemale5to14');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictFemale15to49');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictFemale50to60');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictFemaleAbove60');
+				
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryGenderFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictFemaleSubTotal');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictTotal0to11');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictTotal1to4');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictTotal5to14');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictTotal15to49');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictTotal50to60');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictTotalAbove60');
+				
+				formula="";
+				for(var i=0;i<10;i++){
+					formula+="+["+DEConflictValuesArray[i]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ConflictTotalSubTotal');
+				
+				//-----------------End of Conflict Row Mapping--------------------------------//
+				
+				
+				//-----------------------Major surguries Row Mapping-------------------------//
+				
+				var DEMajorSurgeryValuesArray =new Array(6);
+				
+				DEMajorSurgeryValuesArray[0]='&dimension=dx:HbA2dJBaBGg';   //Chemical-Biological Agent (conflict)
+				DEMajorSurgeryValuesArray[1]='&dimension=dx:BoSpSeOGBKm';   //Gunshot Wound (conflict)
+				DEMajorSurgeryValuesArray[2]='&dimension=dx:HndInK7EwAp';   //Burn (conflict)
+				DEMajorSurgeryValuesArray[3]='&dimension=dx:UOfY3gSKVEO';   //Traumatic Amputation (conflict)
+				DEMajorSurgeryValuesArray[4]='&dimension=dx:LpYhev23bBE';  //Other Conflict Related Injury
+				DEMajorSurgeryValuesArray[5]='&dimension=dx:mBWWbe8xYbI';  //Non-Conflict Related Injury
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgMale0to11');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgMale1to4');
+				
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgMale5to14');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgMale15to49');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgMale50to60');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgMaleAbove60');
+				
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryGenderFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgMaleSubTotal');
+				
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgFemale0to11');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgFemale1to4');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgFemale5to14');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgFemale15to49');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgFemale50to60');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgFemaleAbove60');
+				
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryGenderFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgFemaleSubTotal');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgTotal0to11');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgTotal1to4');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgTotal5to14');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgTotal15to49');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgTotal50to60');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgTotalAbove60');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMajorSurgeryValuesArray[i]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MajorSurgTotalSubTotal');
+				
+				//-----------------------End of Major surguries Row Mapping-------------------------//
+				
+				
+				//-----------------------Minor surguries Row Mapping-------------------------//
+				
+				var DEMinorSurgeryValuesArray =new Array(6);
+				
+				DEMinorSurgeryValuesArray[0]='&dimension=dx:IgJxHPzDWAy';   //Chemical-Biological Agent (conflict)
+				DEMinorSurgeryValuesArray[1]='&dimension=dx:Phe0fKhwiUN';   //Gunshot Wound (conflict)
+				DEMinorSurgeryValuesArray[2]='&dimension=dx:RzPZhnA8E0Y';   //Burn (conflict)
+				DEMinorSurgeryValuesArray[3]='&dimension=dx:Y5Fqj9M8kAY';   //Traumatic Amputation (conflict)
+				DEMinorSurgeryValuesArray[4]='&dimension=dx:VRLAFzIdv1n';  //Other Conflict Related Injury
+				DEMinorSurgeryValuesArray[5]='&dimension=dx:NExcP17SmzT';  //Non-Conflict Related Injury
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgMale0to11');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgMale1to4');
+				
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgMale5to14');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgMale15to49');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgMale50to60');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgMaleAbove60');
+				
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryGenderFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgMaleSubTotal');
+				
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgFemale0to11');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgFemale1to4');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgFemale5to14');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgFemale15to49');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgFemale50to60');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgFemaleAbove60');
+				
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryGenderFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgFemaleSubTotal');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgTotal0to11');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgTotal1to4');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgTotal5to14');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgTotal15to49');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgTotal50to60');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgTotalAbove60');
+				
+				formula="";
+				for(var i=0;i<6;i++){
+					formula+="+["+DEMinorSurgeryValuesArray[i]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MinorSurgTotalSubTotal');
+				
+				//-----------------------End of Minor surguries Row Mapping-------------------------//
+				
+				
+				
+				//------------------------Mortality Row Mapping---------------------------//
+				
+				var MortalityDEArray=new Array();
+				MortalityDEArray[0]='&dimension=dx:mJ4OS1n2l1e';
+				MortalityDEArray[1]='&dimension=dx:aGxFjCBpHwx';
+				MortalityDEArray[2]='&dimension=dx:UuZL3Hk9Q31';
+				MortalityDEArray[3]='&dimension=dx:vCRTI1cU1vr';
+				MortalityDEArray[4]='&dimension=dx:jRrMAVrDZFk';
+				MortalityDEArray[5]='&dimension=dx:htFgv12AOAk';
+				MortalityDEArray[6]='&dimension=dx:Np6IBAi7bXM';
+				MortalityDEArray[7]='&dimension=dx:MO8ZNW7gWKt';
+				MortalityDEArray[8]='&dimension=dx:kLstPA1VIFN';
+				MortalityDEArray[9]='&dimension=dx:ZLeJxPsQlis';
+				MortalityDEArray[10]='&dimension=dx:YL5ltOiXdlT';
+				MortalityDEArray[11]='&dimension=dx:lqyhrgxXBGA';
+				MortalityDEArray[12]='&dimension=dx:n0sLAsYaCpD';
+				MortalityDEArray[13]='&dimension=dx:SiW21cBr0Ls';
+				MortalityDEArray[14]='&dimension=dx:nSOLQCEKbKQ';
+				MortalityDEArray[15]='&dimension=dx:Cz0DktB3SEa';
+				MortalityDEArray[16]='&dimension=dx:WgdZUvYidUa';
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityMale0to11');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityMale1to4');
+				
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityMale5to14');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityMale15to49');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityMale50to60');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityMaleAbove60');
+				
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryGenderFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityMaleSubTotal');
+				
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityFemale0to11');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityFemale1to4');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityFemale5to14');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityFemale15to49');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityFemale50to60');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityFemaleAbove60');
+				
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryGenderFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityFemaleSubTotal');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityTotal0to11');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityTotal1to4');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityTotal5to14');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityTotal15to49');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityTotal50to60');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityTotalAbove60');
+				
+				formula="";
+				for(var i=0;i<17;i++){
+					formula+="+["+MortalityDEArray[i]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#MortalityTotalSubTotal');
+				
+				
+				//------------------------End of Mortality Row Mapping---------------------------//
+				
+				
+				
+				
+				//-----------------------Referral Row Mapping-------------------------//
+				
+				var DEReferralValuesArray =new Array(6);
+				
+				DEReferralValuesArray[0]='&dimension=dx:mcrYet1QaVG';   //Referral inside Syria
+				DEReferralValuesArray[1]='&dimension=dx:m3KwMfCsa29';   //Referral to Turkey
+				
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsMale0to11');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsMale1to4');
+				
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsMale5to14');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsMale15to49');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsMale50to60');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryGenderFilterArray[0]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsMaleAbove60');
+				
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryGenderFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsMaleSubTotal');
+				
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsFemale0to11');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsFemale1to4');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsFemale5to14');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsFemale15to49');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsFemale50to60');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryGenderFilterArray[1]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsFemaleAbove60');
+				
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryGenderFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsFemaleSubTotal');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryAgeFilterArray[0]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsTotal0to11');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryAgeFilterArray[1]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsTotal1to4');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryAgeFilterArray[2]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsTotal5to14');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryAgeFilterArray[3]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsTotal15to49');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryAgeFilterArray[4]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsTotal50to60');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+categoryAgeFilterArray[5]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsTotalAbove60');
+				
+				formula="";
+				for(var i=0;i<2;i++){
+					formula+="+["+DEReferralValuesArray[i]+"]";
+				}
+				getMappedFormulaValue(analyticsURL,formula ,'#ReferrelsTotalSubTotal');
+				
+				//-----------------------End of Referral Row Mapping-------------------------//
+				
+				
+				//------------------------Admission Row Mapping---------------------------//
+				
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=dnTkTGou2TT:QT0Hk38rIoN&filter=KPrmQk3MQau:cUkiDwbsNAE]' ,'#AdmissionMale0to11');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=dnTkTGou2TT:QT0Hk38rIoN&filter=KPrmQk3MQau:baFPsNHckYI]' ,'#AdmissionMale1to4');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=dnTkTGou2TT:QT0Hk38rIoN&filter=KPrmQk3MQau:mJXz8XMPfod]' ,'#AdmissionMale5to14');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=dnTkTGou2TT:QT0Hk38rIoN&filter=KPrmQk3MQau:pmt8j58oArW]' ,'#AdmissionMale15to49');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=dnTkTGou2TT:QT0Hk38rIoN&filter=KPrmQk3MQau:B3DlDpSYQfr]' ,'#AdmissionMale50to60');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=dnTkTGou2TT:QT0Hk38rIoN&filter=KPrmQk3MQau:QfpbuAqtnRV]' ,'#AdmissionMaleAbove60');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=dnTkTGou2TT:QT0Hk38rIoN]','#AdmissionMaleSubTotal');
+				
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=dnTkTGou2TT:K0JjVmoa8kC&filter=KPrmQk3MQau:cUkiDwbsNAE]' ,'#AdmissionFemale0to11');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=dnTkTGou2TT:K0JjVmoa8kC&filter=KPrmQk3MQau:baFPsNHckYI]' ,'#AdmissionFemale1to4');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=dnTkTGou2TT:K0JjVmoa8kC&filter=KPrmQk3MQau:mJXz8XMPfod]' ,'#AdmissionFemale5to14');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=dnTkTGou2TT:K0JjVmoa8kC&filter=KPrmQk3MQau:pmt8j58oArW]' ,'#AdmissionFemale15to49');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=dnTkTGou2TT:K0JjVmoa8kC&filter=KPrmQk3MQau:B3DlDpSYQfr]' ,'#AdmissionFemale50to60');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=dnTkTGou2TT:K0JjVmoa8kC&filter=KPrmQk3MQau:QfpbuAqtnRV]' ,'#AdmissionFemaleAbove60');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=dnTkTGou2TT:K0JjVmoa8kC]' ,'#AdmissionFemaleSubTotal');
+				
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=KPrmQk3MQau:cUkiDwbsNAE]' ,'#AdmissionTotal0to11');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=KPrmQk3MQau:baFPsNHckYI]' ,'#AdmissionTotal1to4');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=KPrmQk3MQau:mJXz8XMPfod]' ,'#AdmissionTotal5to14');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=KPrmQk3MQau:pmt8j58oArW]' ,'#AdmissionTotal15to49');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=KPrmQk3MQau:B3DlDpSYQfr]' ,'#AdmissionTotal50to60');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc&filter=KPrmQk3MQau:QfpbuAqtnRV]' ,'#AdmissionTotalAbove60');
+				getMappedFormulaValue(analyticsURL,'[&dimension=dx:MyS8tXYPDgc]' ,'#AdmissionTotalSubTotal');
+				
+				
+				//------------------------End of Admission Row Mapping---------------------------//
+                reportNotNull=returnReportStatus();
+			}
+			
+			$(document).ready(function () {
+				reportNotNull=false;
+				document.getElementById('noValues').style.display='none';
+				document.getElementById('reportInside').style.display='none';
+				document.getElementById('head').style.display='block';
+				reportLogic();
+				$("#btnExport").click(function (e) {
+					tableToExcel('tableContainer', 'Aggregated Consultation Report');
+					e.preventDefault();
+				});
+				$("#btnBack").click(function (e) {
+                    reportNotNull=false;
+					window.history.go(-1);
+				});
+				$("#btnBack2").click(function (e) {
+                    reportNotNull=false;
+					window.history.go(-1);
+				});
+				$("#btnHome").click(function (e) {
+					var hrefURL=dhisBaseURL.substring(0,dhisBaseURL.length-3);
+					window.location.href = hrefURL+'dhis-web-dashboard-integration/index.action';
+				});
+				$("#btnPrint").click(function (e) {
+					var headstr = "<html><head><title></title></head><body>";
+					var footstr = "</body>";
+					var reportName=document.getElementById('reportName').innerHTML;
+					var newstr = document.all.item('tableContainer').innerHTML;
+					var oldstr = document.body.innerHTML;
+					document.body.innerHTML = headstr+reportName+newstr+footstr;
+					window.print();
+					document.body.innerHTML = oldstr;
+				});
+                if(reportNotNull){
+                    document.getElementById('head').style.display='none';
+                    document.getElementById('reportInside').style.display='block';
+                }
+                else{
+                    document.getElementById('head').style.display='none';
+                    document.getElementById('noValues').style.display='block';
+                }
+			});
+
+			
+		</script>
+		
+	</head>
+    <body id="pageBody">
+    <div id="navigation" class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            <img src="assets/img/news.png" width="35px" height="35px">
+                            &NonBreakingSpace;
+                            <b>[Custom-Reports]</b>
+                        </a>
+                        <label>
+                            <span class="navbar-fixed-top" id="btnHome" style="padding-left:90%; padding-top: 20px">
+                                <div class="label btn-primary">&nbsp;&nbsp;Home&nbsp;&nbsp;</div>
+                            </span>
+                        </label>
+                    </span>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav"></ul>
+            </div>
+        </div>
+    </div>
+    <div class="container" id="head" style="padding-top: 20%">
+        <div style="margin:auto;text-align: center">Report is Loading...</div>
+        <div class="progress progress-striped active" id="cover">
+            <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
+        </div>
+    </div>
+    <div class="container" id="page" style="padding-top: 60px">
+			
+			<div class="container" id="reportInside">
+			<div class="row">
+			<div class="col-md-8" id="reportName">
+			<label><span class="label label-primary">Aggregated Consultation Report</span></label>
+			</div>
+			<div class="col-md-2">
+			<div style="float: left"><label><span class="label btn-success" id="btnBack">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+			</div>
+			<div class="col-md-1">
+			<div style="float: right"><label><span class="label btn-success" id="btnExport">&nbsp;Export to Excel&nbsp;</span></label></div>
+			</div>
+			<div class="col-md-1">
+			<div style="float: left"><label><span class="label btn-success" id="btnPrint">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+			</div>
+			</div>
+			
+			
+			<div class="container">
+			<div class="col-md-12" id="tableContainer" style="padding-top: 20px">
+			<div class="col-md-6"  id="reportTags"></div>
+			<div class="col-md-6"></div>
+			<table class="bordered" id="reportTable">
+			<tr>
+			<th rowspan="3"></th>
+			</tr>
+			<tr>
+			<th colspan="7">Male</th>
+			<th colspan="7">Female</th>
+			<th colspan="7">Total</th>
+			
+			</tr>
+			<tr>
+			<th>0 - 11 mos</th>
+			<th>1 - 4 years</th>
+			<th>5 - 14 years</th>
+			<th>15 - 49 years</th>
+			<th>50 - 60 years</th>
+			<th>60+ years</th>
+			<th>Sub total</th>
+			<th>0 - 11 mos</th>
+			<th>1 - 4 years</th>
+			<th>5 - 14 years</th>
+			<th>15 - 49 years</th>
+			<th>50 - 60 years</th>
+			<th>60+ years</th>
+			<th>Sub Total</th>
+			<th>0 - 11 mos</th>
+			<th>1 - 4 years</th>
+			<th>5 - 14 years</th>
+			<th>15 - 49 years</th>
+			<th>50 - 60 years</th>
+			<th>60+ years</th>
+			<th>Sub Total</th>
+			</tr>
+			<tr>
+			<td>Total consultation</td>
+			<td id="TotalMale0to11"></td>
+			<td id="TotalMale1to4"></td>
+			<td id="TotalMale5to14"></td>
+			<td id="TotalMale15to49"></td>
+			<td id="TotalMale50to60"></td>
+			<td id="TotalMaleAbove60"></td>
+			<td id="TotalMaleSubTotal"></td>
+			<td id="TotalFemale0to11"></td>
+			<td id="TotalFemale1to4"></td>
+			<td id="TotalFemale5to14"></td>
+			<td id="TotalFemale15to49"></td>
+			<td id="TotalFemale50to60"></td>
+			<td id="TotalFemaleAbove60"></td>
+			<td id="TotalFemaleSubTotal"></td>
+			<td id="TotalTotal0to11"></td>
+			<td id="TotalTotal1to4"></td>
+			<td id="TotalTotal5to14"></td>
+			<td id="TotalTotal15to49"></td>
+			<td id="TotalTotal50to60"></td>
+			<td id="TotalTotalAbove60"></td>
+			<td id="TotalTotalSubTotal"></td>
+			
+			</tr>
+			<tr>
+			<td>Chronic</td>
+			<td id="ChronicMale0to11"></td>
+			<td id="ChronicMale1to4"></td>
+			<td id="ChronicMale5to14"></td>
+			<td id="ChronicMale15to49"></td>
+			<td id="ChronicMale50to60"></td>
+			<td id="ChronicMaleAbove60"></td>
+			<td id="ChronicMaleSubTotal"></td>
+			<td id="ChronicFemale0to11"></td>
+			<td id="ChronicFemale1to4"></td>
+			<td id="ChronicFemale5to14"></td>
+			<td id="ChronicFemale15to49"></td>
+			<td id="ChronicFemale50to60"></td>
+			<td id="ChronicFemaleAbove60"></td>
+			<td id="ChronicFemaleSubTotal"></td>
+			<td id="ChronicTotal0to11"></td>
+			<td id="ChronicTotal1to4"></td>
+			<td id="ChronicTotal5to14"></td>
+			<td id="ChronicTotal15to49"></td>
+			<td id="ChronicTotal50to60"></td>
+			<td id="ChronicTotalAbove60"></td>
+			<td id="ChronicTotalSubTotal"></td>
+			
+			</tr>
+			<tr>
+			<td>Conflict</td>
+			<td id="ConflictMale0to11"></td>
+			<td id="ConflictMale1to4"></td>
+			<td id="ConflictMale5to14"></td>
+			<td id="ConflictMale15to49"></td>
+			<td id="ConflictMale50to60"></td>
+			<td id="ConflictMaleAbove60"></td>
+			<td id="ConflictMaleSubTotal"></td>
+			<td id="ConflictFemale0to11"></td>
+			<td id="ConflictFemale1to4"></td>
+			<td id="ConflictFemale5to14"></td>
+			<td id="ConflictFemale15to49"></td>
+			<td id="ConflictFemale50to60"></td>
+			<td id="ConflictFemaleAbove60"></td>
+			<td id="ConflictFemaleSubTotal"></td>
+			<td id="ConflictTotal0to11"></td>
+			<td id="ConflictTotal1to4"></td>
+			<td id="ConflictTotal5to14"></td>
+			<td id="ConflictTotal15to49"></td>
+			<td id="ConflictTotal50to60"></td>
+			<td id="ConflictTotalAbove60"></td>
+			<td id="ConflictTotalSubTotal"></td>
+			
+			</tr>
+			<tr>
+			<td>Major surguries</td>
+			<td id="MajorSurgMale0to11"></td>
+			<td id="MajorSurgMale1to4"></td>
+			<td id="MajorSurgMale5to14"></td>
+			<td id="MajorSurgMale15to49"></td>
+			<td id="MajorSurgMale50to60"></td>
+			<td id="MajorSurgMaleAbove60"></td>
+			<td id="MajorSurgMaleSubTotal"></td>
+			<td id="MajorSurgFemale0to11"></td>
+			<td id="MajorSurgFemale1to4"></td>
+			<td id="MajorSurgFemale5to14"></td>
+			<td id="MajorSurgFemale15to49"></td>
+			<td id="MajorSurgFemale50to60"></td>
+			<td id="MajorSurgFemaleAbove60"></td>
+			<td id="MajorSurgFemaleSubTotal"></td>
+			<td id="MajorSurgTotal0to11"></td>
+			<td id="MajorSurgTotal1to4"></td>
+			<td id="MajorSurgTotal5to14"></td>
+			<td id="MajorSurgTotal15to49"></td>
+			<td id="MajorSurgTotal50to60"></td>
+			<td id="MajorSurgTotalAbove60"></td>
+			<td id="MajorSurgTotalSubTotal"></td>
+			
+			</tr>
+			<tr>
+			<td>Minor Surguries</td>
+			<td id="MinorSurgMale0to11"></td>
+			<td id="MinorSurgMale1to4"></td>
+			<td id="MinorSurgMale5to14"></td>
+			<td id="MinorSurgMale15to49"></td>
+			<td id="MinorSurgMale50to60"></td>
+			<td id="MinorSurgMaleAbove60"></td>
+			<td id="MinorSurgMaleSubTotal"></td>
+			<td id="MinorSurgFemale0to11"></td>
+			<td id="MinorSurgFemale1to4"></td>
+			<td id="MinorSurgFemale5to14"></td>
+			<td id="MinorSurgFemale15to49"></td>
+			<td id="MinorSurgFemale50to60"></td>
+			<td id="MinorSurgFemaleAbove60"></td>
+			<td id="MinorSurgFemaleSubTotal"></td>
+			<td id="MinorSurgTotal0to11"></td>
+			<td id="MinorSurgTotal1to4"></td>
+			<td id="MinorSurgTotal5to14"></td>
+			<td id="MinorSurgTotal15to49"></td>
+			<td id="MinorSurgTotal50to60"></td>
+			<td id="MinorSurgTotalAbove60"></td>
+			<td id="MinorSurgTotalSubTotal"></td>
+			
+			</tr>
+			<tr>
+			<td>Mortality</td>
+			<td id="MortalityMale0to11"></td>
+			<td id="MortalityMale1to4"></td>
+			<td id="MortalityMale5to14"></td>
+			<td id="MortalityMale15to49"></td>
+			<td id="MortalityMale50to60"></td>
+			<td id="MortalityMaleAbove60"></td>
+			<td id="MortalityMaleSubTotal"></td>
+			<td id="MortalityFemale0to11"></td>
+			<td id="MortalityFemale1to4"></td>
+			<td id="MortalityFemale5to14"></td>
+			<td id="MortalityFemale15to49"></td>
+			<td id="MortalityFemale50to60"></td>
+			<td id="MortalityFemaleAbove60"></td>
+			<td id="MortalityFemaleSubTotal"></td>
+			<td id="MortalityTotal0to11"></td>
+			<td id="MortalityTotal1to4"></td>
+			<td id="MortalityTotal5to14"></td>
+			<td id="MortalityTotal15to49"></td>
+			<td id="MortalityTotal50to60"></td>
+			<td id="MortalityTotalAbove60"></td>
+			<td id="MortalityTotalSubTotal"></td>
+			
+			</tr>
+			<tr>
+			<td>Referrels</td>
+			<td id="ReferrelsMale0to11"></td>
+			<td id="ReferrelsMale1to4"></td>
+			<td id="ReferrelsMale5to14"></td>
+			<td id="ReferrelsMale15to49"></td>
+			<td id="ReferrelsMale50to60"></td>
+			<td id="ReferrelsMaleAbove60"></td>
+			<td id="ReferrelsMaleSubTotal"></td>
+			<td id="ReferrelsFemale0to11"></td>
+			<td id="ReferrelsFemale1to4"></td>
+			<td id="ReferrelsFemale5to14"></td>
+			<td id="ReferrelsFemale15to49"></td>
+			<td id="ReferrelsFemale50to60"></td>
+			<td id="ReferrelsFemaleAbove60"></td>
+			<td id="ReferrelsFemaleSubTotal"></td>
+			<td id="ReferrelsTotal0to11"></td>
+			<td id="ReferrelsTotal1to4"></td>
+			<td id="ReferrelsTotal5to14"></td>
+			<td id="ReferrelsTotal15to49"></td>
+			<td id="ReferrelsTotal50to60"></td>
+			<td id="ReferrelsTotalAbove60"></td>
+			<td id="ReferrelsTotalSubTotal"></td>
+			</tr>
+			<tr>
+			<td>Admission</td>
+			<td id="AdmissionMale0to11"></td>
+			<td id="AdmissionMale1to4"></td>
+			<td id="AdmissionMale5to14"></td>
+			<td id="AdmissionMale15to49"></td>
+			<td id="AdmissionMale50to60"></td>
+			<td id="AdmissionMaleAbove60"></td>
+			<td id="AdmissionMaleSubTotal"></td>
+			<td id="AdmissionFemale0to11"></td>
+			<td id="AdmissionFemale1to4"></td>
+			<td id="AdmissionFemale5to14"></td>
+			<td id="AdmissionFemale15to49"></td>
+			<td id="AdmissionFemale50to60"></td>
+			<td id="AdmissionFemaleAbove60"></td>
+			<td id="AdmissionFemaleSubTotal"></td>
+			<td id="AdmissionTotal0to11"></td>
+			<td id="AdmissionTotal1to4"></td>
+			<td id="AdmissionTotal5to14"></td>
+			<td id="AdmissionTotal15to49"></td>
+			<td id="AdmissionTotal50to60"></td>
+			<td id="AdmissionTotalAbove60"></td>
+			<td id="AdmissionTotalSubTotal"></td>
+			
+			</tr>
+			</table>
+			<br>
+			</div>
+			</div>
+			</div>
+			</div>
+			<div id="noValues" style="padding-top: 5%">
+			<div class="row">
+			<div class="col-md-5"></div>
+			<div class="col-md-2"> <img src="assets/img/noValues.png"> </div>
+			<div class="col-md-5"></div>
+			</div>
+			<h1 style="text-align: center">No values found. Please change report parameters.</h1><br>
+			<div class="row">
+			<div class="col-md-5"></div>
+			<div class="col-md-2">
+			<div style="float: left"><label><span class="label btn-success" id="btnBack2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+			</div>
+			<div class="col-md-5"></div>
+			</div>
+			</div>
+			</body>
+			</html>					

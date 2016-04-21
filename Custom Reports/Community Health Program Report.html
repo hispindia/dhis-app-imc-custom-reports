@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="IMC Custom Reporting App">
+    <meta name="author" content="Gaurav<gaurav08021@gmail.com>">
+    <link rel="shortcut icon" href="assets/ico/favicon.png">
+
+    <title>Custom Reports</title>
+    <!-- Bootstrap core CSS -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <!-- Jasny Bootstrap-Extension CSS -->
+    <link href="assets/css/jasny-bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-select.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-datetimepicker.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="assets/css/main.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet'
+          type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,300,700' rel='stylesheet' type='text/css'>
+    <link href="assets/js/DataTables-1.10.4/media/css/jquery.dataTables.css" rel="stylesheet" type="text/css">
+    <link href='assets/css/bordered.css' rel='stylesheet' type='text/css'>
+
+
+    <script type="text/javascript" src="assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap.js"></script>
+    <script type="text/javascript" src="assets/js/jasny-bootstrap.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap-select.js"></script>
+    <script type="text/javascript" src="assets/js/moment.js"></script>
+    <script type="text/javascript" src="assets/js/DataTables-1.10.4/media/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="assets/js/DataTables-1.10.4/extensions/TableTools/js/dataTables.tableTools.js"></script>
+    <script type="text/javascript" src="assets/js/exportExcel.js"></script>
+    <script type="text/javascript" src="assets/js/reportValues.js"></script>
+
+
+    <script type="application/javascript">
+        var dhisBaseURL='';
+
+        var reportLogic = function () {
+
+            //--------Get all parameters from session memory------//
+            dhisBaseURL = sessionStorage.getItem('dhisBaseURL');
+            var orgUnitName = sessionStorage.getItem('orgUnitName');
+            var startDate = sessionStorage.getItem('startDate');
+            var endDate = sessionStorage.getItem('endDate');
+            var donorName = sessionStorage.getItem('donorName');
+            var impName = sessionStorage.getItem('impName');
+            var orgUnitGroupName = sessionStorage.getItem('orgUnitGroupName');
+            var orgUnitLevelName = sessionStorage.getItem('orgUnitLevelName');
+            var donorCode = sessionStorage.getItem('donorCode');
+            var impCode = sessionStorage.getItem('impCode');
+            var orgUnitGroupCode = sessionStorage.getItem('orgUnitGroupCode');
+            var orgUnitLevelCode = sessionStorage.getItem('orgUnitLevelCode');
+            var orgUnitCode = sessionStorage.getItem('orgUnitCode');
+            var periodList = sessionStorage.getItem('periodList');
+            //---------------------------------------------------//
+
+            var deURL = dhisBaseURL+'/analytics?'+'&filter=pe:'+periodList;
+            var indicatorURL = dhisBaseURL+'/analytics?'+'&dimension=pe:'+periodList;
+
+            console.log(donorCode);
+            console.log(impCode);
+            console.log(orgUnitGroupCode);
+            console.log(orgUnitLevelCode);
+            console.log(orgUnitCode);
+            console.log(donorCode);
+            console.log(startDate);
+            console.log(endDate);
+            console.log(donorName);
+            console.log(impName);
+
+            if (orgUnitCode != "") {
+                $('#reportTags').append('<div class="row"></row><label>Org. Unit Name: ' + orgUnitName + '</label></div>');
+                deURL = deURL.concat('&filter=ou:' + orgUnitCode);
+                indicatorURL = indicatorURL.concat('&filter=ou:' + orgUnitCode);
+            }
+            else if (orgUnitGroupCode != "") {
+                $('#reportTags').append('<div class="row"><label>Org. Unit Group: ' + orgUnitGroupName + '</label></div>');
+                deURL = deURL.concat('&filter=ou:OU_GROUP-' + orgUnitGroupCode);
+                indicatorURL = indicatorURL.concat('&filter=ou:OU_GROUP-' + orgUnitGroupCode);
+            }
+            else {
+                $('#reportTags').append('<div class="row"><label>Org. Unit Level: ' + orgUnitLevelName + '</label></div>');
+                deURL = deURL.concat('&filter=ou:LEVEL-6');
+                indicatorURL = indicatorURL.concat('&filter=ou:LEVEL-6');
+            }
+
+            $('#reportTags').append('<div class="row"><label>' + startDate + ' to ' + endDate + '</label></div>');
+
+            if (donorCode != "") {
+                $('#reportTags').append('<div class="row"><label>Donor: ' + donorName + '</label></div>');
+                deURL = deURL.concat('&filter=Q3QQy1PWrqe:' + donorCode);
+                indicatorURL = indicatorURL.concat('&filter=Q3QQy1PWrqe:' + donorCode);
+            }
+            if (impCode != "") {
+                $('#reportTags').append('<div class="row"><label>Implementation Partner: ' + impName + '</label></div>');
+                deURL = deURL.concat('&filter=XkPfFUjhEui:' + impCode);
+                indicatorURL = indicatorURL.concat('&filter=XkPfFUjhEui:' + impCode);
+            }
+
+            console.log('Analytics URL Template: '+deURL);
+
+            //--------------------------------Value Maps-----------------------------------------//
+
+            getMappedDEValue(deURL,'K1lWCEZf29u',null,'#active_chw');
+            getMappedDEValue(deURL,'MyztxWup5bG',null,'#h_visits');
+
+            getMappedDEValue(deURL,'rG3V33JFOJ4','&filter=dnTkTGou2TT:QT0Hk38rIoN','#h_male_ben');
+            getMappedDEValue(deURL,'rG3V33JFOJ4','&filter=dnTkTGou2TT:K0JjVmoa8kC','#h_female_ben');
+            getMappedDEValue(deURL,'rG3V33JFOJ4',null,'#h_ben');
+
+            getMappedDEValue(deURL,'hNUmaKeCo7X',null,'#nofe');
+            getMappedDEValue(deURL,'FxXtWuMV1H5','&filter=dnTkTGou2TT:QT0Hk38rIoN','#nob_male');
+            getMappedDEValue(deURL,'FxXtWuMV1H5','&filter=dnTkTGou2TT:K0JjVmoa8kC','#nob_female');
+            getMappedDEValue(deURL,'FxXtWuMV1H5',null,'#nob_e');
+            getMappedIndicatorValue(indicatorURL,'uFlgH7uv60f','#nob');
+
+            getMappedDEValue(deURL,'B88bSDDiHrr',null,'#nor_gc');
+            getMappedDEValue(deURL,'lTjDfmJiRPM',null,'#nor_mhpss');
+            getMappedDEValue(deURL,'FAULf0CGLfc',null,'#nor_r');
+            getMappedIndicatorValue(indicatorURL,'FSiz2j99NAL','#nor_cmam');
+            getMappedDEValue(deURL,'N2htmDpYgVV',null,'#nor_rh');
+            getMappedIndicatorValue(indicatorURL,'P1B0hF7tlfA','#nor_tot');
+            getMappedDEValue(deURL,'PDjNsCb9cya',null,'#nopws');
+            getMappedDEValue(deURL,'JkP9RYoj6Ea',null,'#nofd');
+
+            getMappedDEValue(deURL,'jR58Wc4M6Gp','&filter=dnTkTGou2TT:QT0Hk38rIoN','#totalSMale');
+            getMappedDEValue(deURL,'jR58Wc4M6Gp','&filter=dnTkTGou2TT:K0JjVmoa8kC','#totalSFemale');
+            getMappedDEValue(deURL,'jR58Wc4M6Gp',null,'#totalSTotal');
+
+            getMappedDEValue(deURL,'FFy5cI52yZa','&filter=dnTkTGou2TT:QT0Hk38rIoN','#MUAC115Male');
+            getMappedDEValue(deURL,'FFy5cI52yZa','&filter=dnTkTGou2TT:K0JjVmoa8kC','#MUAC115Female');
+            getMappedDEValue(deURL,'FFy5cI52yZa',null,'#MUAC115Total');
+
+            getMappedDEValue(deURL,'EDG09YqP29p','&filter=dnTkTGou2TT:QT0Hk38rIoN','#MUAC125Male');
+            getMappedDEValue(deURL,'EDG09YqP29p','&filter=dnTkTGou2TT:K0JjVmoa8kC','#MUAC125Female');
+            getMappedDEValue(deURL,'EDG09YqP29p',null,'#MUAC125Total');
+
+            getMappedDEValue(deURL,'YQDR8auRssE','&filter=dnTkTGou2TT:QT0Hk38rIoN','#EdmaMale');
+            getMappedDEValue(deURL,'YQDR8auRssE','&filter=dnTkTGou2TT:K0JjVmoa8kC','#EdmaFemale');
+            getMappedDEValue(deURL,'YQDR8auRssE',null,'#EdmaTotal');
+
+            getMappedIndicatorValue(indicatorURL,'FFzdAmyso3V','#CHAMMale');
+            getMappedIndicatorValue(indicatorURL,'Is710i3tY7A','#CHAMFemale');
+            getMappedIndicatorValue(indicatorURL,'FSiz2j99NAL','#CHAMTotal');
+
+            //-------------------------------------------------------------------------------------//
+
+            reportNotNull=returnReportStatus();
+        }
+
+
+
+        $(document).ready(function () {
+            reportNotNull=false;
+            document.getElementById('noValues').style.display='none';
+            document.getElementById('reportInside').style.display='none';
+            document.getElementById('head').style.display='block';
+
+            reportLogic();
+            $("#btnExport").click(function (e) {
+                tableToExcel('tableContainer', 'Community Health Program Report');
+                e.preventDefault();
+            });
+            $("#btnBack").click(function (e) {
+                reportNotNull=false;
+                window.history.go(-1);
+            });
+            $("#btnBack2").click(function (e) {
+                reportNotNull=false;
+                window.history.go(-1);
+            });
+            $("#btnHome").click(function (e) {
+                var hrefURL=dhisBaseURL.substring(0,dhisBaseURL.length-3);
+                window.location.href = hrefURL+'dhis-web-dashboard-integration/index.action';
+            });
+            $("#btnPrint").click(function (e) {
+                var headstr = "<html><head><title></title></head><body>";
+                var footstr = "</body>";
+                var reportName=document.getElementById('reportName').innerHTML;
+                var newstr = document.all.item('tableContainer').innerHTML;
+                var oldstr = document.body.innerHTML;
+                document.body.innerHTML = headstr+reportName+newstr+footstr;
+                window.print();
+                document.body.innerHTML = oldstr;
+            });
+            if(reportNotNull){
+                document.getElementById('head').style.display='none';
+                document.getElementById('reportInside').style.display='block';
+            }
+            else{
+                document.getElementById('head').style.display='none';
+                document.getElementById('noValues').style.display='block';
+            }
+        });
+
+
+    </script>
+</head>
+<body id="pageBody">
+<div id="navigation" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            <img src="assets/img/news.png" width="35px" height="35px">
+                            &NonBreakingSpace;
+                            <b>[Custom-Reports]</b>
+                        </a>
+                        <label>
+                            <span class="navbar-fixed-top" id="btnHome" style="padding-left:90%; padding-top: 20px">
+                                <div class="label btn-primary">&nbsp;&nbsp;Home&nbsp;&nbsp;</div>
+                            </span>
+                        </label>
+                    </span>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav"></ul>
+        </div>
+    </div>
+</div>
+<div class="container" id="head" style="padding-top: 20%">
+    <div style="margin:auto;text-align: center">Report is Loading...</div>
+    <div class="progress progress-striped active" id="cover">
+        <div class="progress-bar progress-bar-info"
+             role="progressbar"
+             aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+             style="width: 100%;">
+        </div>
+    </div>
+</div>
+<div class="container" id="page" style="padding-top: 60px">
+
+    <div class="container" id="reportInside">
+        <div class="row">
+            <div class="col-md-8" id="reportName">
+                <label><span class="label label-primary">Community Health Program Report</span></label>
+            </div>
+            <div class="col-md-2">
+                <div style="float: left"><label><span class="label btn-success" id="btnBack">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+            </div>
+            <div class="col-md-1">
+                <div style="float: right"><label><span class="label btn-success" id="btnExport">&nbsp;Export to Excel&nbsp;</span></label></div>
+            </div>
+            <div class="col-md-1">
+                <div style="float: left"><label><span class="label btn-success" id="btnPrint">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+            </div>
+        </div>
+
+
+    <div class="container">
+        <div class="col-md-12" id="tableContainer" style="padding-top: 20px">
+            <div class="col-md-6"  id="reportTags"></div>
+            <div class="col-md-6"></div>
+            <table class="bordered" id="reportTable">
+                <tr>
+                    <th colspan="4" height="40" align="center">Beneficiary Details</th>
+                </tr>
+                <tr>
+                    <td width="285">Number of Active CHWs</td>
+                    <td id="active_chw"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">Number of household visits</td>
+                    <td id="h_visits"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">Number of household male beneficiaries</td>
+                    <td id="h_male_ben"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">Number of household female beneficiaries</td>
+                    <td id="h_female_ben"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">Total number of household beneficiaries</td>
+                    <td id="h_ben"></td>
+                </tr>
+            </table>
+
+            <br><br>
+
+            <table class="bordered">
+                <tr>
+                    <th colspan="4" height="40" align="center">Other Events</th>
+                </tr>
+                <tr>
+                    <td width="279">Number of events</td>
+                    <td id="nofe"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">Number of events male beneficiaries</td>
+                    <td id="nob_male"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">Number of events female beneficiaries</td>
+                    <td id="nob_female"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">Total number ofeventsbeneficiaries</td>
+                    <td id="nob_e"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">Total Beneficiaries</td>
+                    <td id="nob"></td>
+                </tr>
+            </table>
+
+            <br><br>
+
+            <table class="bordered">
+                <tr>
+                    <th colspan="4" height="40" align="center">Number of referrals</th>
+                </tr>
+
+                <tr>
+                    <td width="279">General clinic</td>
+                    <td id="nor_gc"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">MHPSS</td>
+                    <td id="nor_mhpss"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">Rehabilitation</td>
+                    <td id="nor_r"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">CMAM</td>
+                    <td id="nor_cmam"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">RH</td>
+                    <td id="nor_rh"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">Total referrals</td>
+                    <td id="nor_tot"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">Number of pregnant women seen</td>
+                    <td id="nopws"></td>
+                </tr>
+
+                <tr>
+                    <td width="279">Number of flyers distributed</td>
+                    <td id="nofd"></td>
+                </tr>
+            </table>
+
+            <br><br>
+
+            <table class="bordered">
+                <thead>
+                <tr>
+                    <th colspan=4 height=40 align="center">CMAM(Outreach Activities)</th>
+                </tr>
+                </thead>
+                <tr>
+                    <td></td>
+                    <td>Male</td>
+                    <td>Female</td>
+                    <td>Total</td>
+                </tr>
+
+                <tr>
+                    <td width="400">Total Screened</td>
+                    <td id="totalSMale"></td>
+                    <td id="totalSFemale"></td>
+                    <td id="totalSTotal"></td>
+                </tr>
+
+                <tr>
+                    <td width="400">Total referred MUAC less than 115 mm without Edema</td>
+                    <td id="MUAC115Male"></td>
+                    <td id="MUAC115Female"></td>
+                    <td id="MUAC115Total"></td>
+                </tr>
+
+                <tr>
+                    <td width="400">Total referred MUAC 115-125 mm without Edema</td>
+                    <td id="MUAC125Male"></td>
+                    <td id="MUAC125Female"></td>
+                    <td id="MUAC125Total"></td>
+                </tr>
+
+                <tr>
+                    <td width="400">Total referred with Edema</td>
+                    <td id="EdmaMale"></td>
+                    <td id="EdmaFemale"></td>
+                    <td id="EdmaTotal"></td>
+                </tr>
+
+                <tr>
+                    <td width="400">Total referred for CMAM</td>
+                    <td id="CHAMMale"></td>
+                    <td id="CHAMFemale"></td>
+                    <td id="CHAMTotal"></td>
+                </tr>
+                <tr>
+                    <td >Topics covered</td>
+                    <td colspan="3" id="Topics"></td>
+                </tr>
+            </table>
+
+            <br><br>
+
+        </div>
+    </div>
+</div>
+</div>
+<div id="noValues" style="padding-top: 5%">
+    <div class="row">
+        <div class="col-md-5"></div>
+        <div class="col-md-2"> <img src="assets/img/noValues.png"> </div>
+        <div class="col-md-5"></div>
+    </div>
+    <h1 style="text-align: center">No values found. Please change report parameters.</h1><br>
+    <div class="row">
+        <div class="col-md-5"></div>
+        <div class="col-md-2">
+            <div style="float: left"><label><span class="label btn-success" id="btnBack2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+        </div>
+        <div class="col-md-5"></div>
+    </div>
+</div>
+</body>
+</html>
+

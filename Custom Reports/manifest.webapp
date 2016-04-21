@@ -1,0 +1,20 @@
+{
+  "version": "0.1",
+  "name": "Custom Reports",
+  "description": "The custom reports module for the IMC",
+  "launch_path": "index.html",
+  "developer": {
+    "name": "HISP India",
+    "url": "http://hispindia.org"
+   },
+  "icons":
+  {
+     "48": "/assets/img/news.png"
+  },
+  "default_locale": "en",
+  "activities": {
+      "dhis": {
+          "href": "*"
+      }
+  }
+}

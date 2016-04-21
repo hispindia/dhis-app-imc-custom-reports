@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="IMC Custom Reporting App">
+<meta name="author" content="Gaurav<gaurav08021@gmail.com>">
+<link rel="shortcut icon" href="assets/ico/favicon.png">
+
+<title>Custom Reports</title>
+<!-- Bootstrap core CSS -->
+<link href="assets/css/bootstrap.css" rel="stylesheet">
+<!-- Jasny Bootstrap-Extension CSS -->
+<link href="assets/css/jasny-bootstrap.css" rel="stylesheet">
+<link href="assets/css/bootstrap-select.css" rel="stylesheet">
+<link href="assets/css/bootstrap-datetimepicker.css" rel="stylesheet">
+<!-- Custom styles for this template -->
+<link href="assets/css/main.css" rel="stylesheet">
+<link href='https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet'
+      type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Raleway:400,300,700' rel='stylesheet' type='text/css'>
+<link href='assets/css/bordered.css' rel='stylesheet' type='text/css'>
+
+
+<script type="text/javascript" src="assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="assets/js/bootstrap.js"></script>
+<script type="text/javascript" src="assets/js/jasny-bootstrap.js"></script>
+<script type="text/javascript" src="assets/js/bootstrap-select.js"></script>
+<script type="text/javascript" src="assets/js/moment.js"></script>
+<script type="text/javascript" src="assets/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="assets/js/exportExcel.js"></script>
+<script type="text/javascript" src="assets/js/reportValues.js"></script>
+
+<script type="application/javascript">
+var dhisBaseURL='';
+var reportLogic = function () {
+
+    //--------Get all parameters from session memory------//
+    dhisBaseURL = sessionStorage.getItem('dhisBaseURL');
+    var orgUnitName = sessionStorage.getItem('orgUnitName');
+    var startDate = sessionStorage.getItem('startDate');
+    var endDate = sessionStorage.getItem('endDate');
+    var donorName = sessionStorage.getItem('donorName');
+    var impName = sessionStorage.getItem('impName');
+    var orgUnitGroupName = sessionStorage.getItem('orgUnitGroupName');
+    var orgUnitLevelName = sessionStorage.getItem('orgUnitLevelName');
+    var donorCode = sessionStorage.getItem('donorCode');
+    var impCode = sessionStorage.getItem('impCode');
+    var orgUnitGroupCode = sessionStorage.getItem('orgUnitGroupCode');
+    var orgUnitLevelCode = sessionStorage.getItem('orgUnitLevelCode');
+    var orgUnitCode = sessionStorage.getItem('orgUnitCode');
+    var periodList = sessionStorage.getItem('periodList');
+    //-----------------------------------------------------//
+
+
+    var analyticsURL = dhisBaseURL+'/analytics?' + '&dimension=pe:' + periodList;
+
+    console.log(donorCode);
+    console.log(impCode);
+    console.log(orgUnitGroupCode);
+    console.log(orgUnitLevelCode);
+    console.log(orgUnitCode);
+    console.log(donorCode);
+    console.log(startDate);
+    console.log(endDate);
+    console.log(donorName);
+    console.log(impName);
+
+    if (orgUnitCode != "") {
+        $('#reportTags').append('<div class="row"></row><label>Org. Unit Name: ' + orgUnitName + '</label></div>');
+        analyticsURL = analyticsURL.concat('&filter=ou:' + orgUnitCode);
+    }
+    else if (orgUnitGroupCode != "") {
+        $('#reportTags').append('<div class="row"><label>Org. Unit Group: ' + orgUnitGroupName + '</label></div>');
+        analyticsURL = analyticsURL.concat('&filter=ou:OU_GROUP-' + orgUnitGroupCode);
+    }
+    else {
+        $('#reportTags').append('<div class="row"><label>Org. Unit Level: ' + orgUnitLevelName + '</label></div>');
+        analyticsURL = analyticsURL.concat('&filter=ou:LEVEL-6');
+    }
+
+    $('#reportTags').append('<div class="row"><label>' + startDate + ' to ' + endDate + '</label></div>');
+
+    if (impCode != "") {
+        $('#reportTags').append('<div class="row"><label>Implementation Partner: ' + impName + '</label></div>');
+        analyticsURL = analyticsURL.concat('&filter=XkPfFUjhEui:' + impCode);
+    }
+
+
+
+    var categoryFiltersArray=new Array(4);
+    categoryFiltersArray[0]='&filter=dnTkTGou2TT:QT0Hk38rIoN&filter=D7A23oH8vyl:O5KkOlGDNhF';//6-23 Males
+    categoryFiltersArray[1]='&filter=dnTkTGou2TT:K0JjVmoa8kC&filter=D7A23oH8vyl:O5KkOlGDNhF';//6-23 Females
+    categoryFiltersArray[2]='&filter=dnTkTGou2TT:QT0Hk38rIoN&filter=D7A23oH8vyl:FPovCdOtz0Z';//24-59 Males
+    categoryFiltersArray[3]='&filter=dnTkTGou2TT:K0JjVmoa8kC&filter=D7A23oH8vyl:FPovCdOtz0Z';//24-59 Females
+
+    //OTP Indicator Mappings
+
+    var OTPAdmissionDEArray = new Array(9);
+    OTPAdmissionDEArray[0]='&dimension=dx:E7qv1NRUOxE';  //New Admission_MUAC >= 115
+    OTPAdmissionDEArray[1]='&dimension=dx:HjnVZMqi4fs';  //New Admission_W/H >= -3
+    OTPAdmissionDEArray[2]='&dimension=dx:ilAEh706Zfq';  //Bilateral Oedema
+    OTPAdmissionDEArray[3]='&dimension=dx:VPKKeiK8i2P';  //Relapese
+    OTPAdmissionDEArray[4]='&dimension=dx:isvSMiM4kiD';  //Re-admission
+    OTPAdmissionDEArray[5]='&dimension=dx:HxQbxHgrQMz';  //Referred from SFP
+    OTPAdmissionDEArray[6]='&dimension=dx:BwvtZ9eCsY0';  //Referred from_IPF
+    OTPAdmissionDEArray[7]='&dimension=dx:VZw3F23CJDH';  //Referred from Another OTP
+    OTPAdmissionDEArray[8]='&dimension=dx:nyw1xKq3P2q';  //Other
+
+    var OTPOutcomeDEArray=new Array(8);
+    OTPOutcomeDEArray[0]='&dimension=dx:nni1agcCVA2';    //Discharged as_Recovered
+    OTPOutcomeDEArray[1]='&dimension=dx:JmiDOUWrJCr';    //Discharged as_Death
+    OTPOutcomeDEArray[2]='&dimension=dx:HwtIHaWG3gJ';    //Discharged as_Deafulter
+    OTPOutcomeDEArray[3]='&dimension=dx:J9Fk4Plsu4c';    //Referred to_IPF
+    OTPOutcomeDEArray[4]='&dimension=dx:bJc0PzzQ6Lc';    //Referred to_Other OTP
+    OTPOutcomeDEArray[5]='&dimension=dx:b0nohsgy9J9';    //Medical Referral
+    OTPOutcomeDEArray[6]='&dimension=dx:rjB3jnJFFrG';    //Non-Response
+    OTPOutcomeDEArray[7]='&dimension=dx:LAQwLx2VRcr';    //Other
+
+
+    var OTPAddFormulaTotalNewAdmissionMUAC='['+OTPAdmissionDEArray[0]+categoryFiltersArray[0]+']+['+OTPAdmissionDEArray[0]+categoryFiltersArray[1]+']+['+OTPAdmissionDEArray[0]+categoryFiltersArray[2]+']+['+OTPAdmissionDEArray[0]+categoryFiltersArray[3]+']';
+    var OTPAddFormulaTotalNewAdmissionWH='['+OTPAdmissionDEArray[1]+categoryFiltersArray[0]+']+['+OTPAdmissionDEArray[1]+categoryFiltersArray[1]+']+['+OTPAdmissionDEArray[1]+categoryFiltersArray[2]+']+['+OTPAdmissionDEArray[1]+categoryFiltersArray[3]+']';
+    var OTPAddFormulaTotalNewAdmissionBilateral='['+OTPAdmissionDEArray[2]+categoryFiltersArray[0]+']+['+OTPAdmissionDEArray[2]+categoryFiltersArray[1]+']+['+OTPAdmissionDEArray[2]+categoryFiltersArray[2]+']+['+OTPAdmissionDEArray[2]+categoryFiltersArray[3]+']';
+    var OTPAddFormulaTotalRelapse='['+OTPAdmissionDEArray[3]+categoryFiltersArray[0]+']+['+OTPAdmissionDEArray[3]+categoryFiltersArray[1]+']+['+OTPAdmissionDEArray[3]+categoryFiltersArray[2]+']+['+OTPAdmissionDEArray[3]+categoryFiltersArray[3]+']';
+    var OTPAddFormulaTotalReadmission='['+OTPAdmissionDEArray[4]+categoryFiltersArray[0]+']+['+OTPAdmissionDEArray[4]+categoryFiltersArray[1]+']+['+OTPAdmissionDEArray[4]+categoryFiltersArray[2]+']+['+OTPAdmissionDEArray[4]+categoryFiltersArray[3]+']';
+    var OTPAddFormulaTotalReferredFromSFP='['+OTPAdmissionDEArray[5]+categoryFiltersArray[0]+']+['+OTPAdmissionDEArray[5]+categoryFiltersArray[1]+']+['+OTPAdmissionDEArray[5]+categoryFiltersArray[2]+']+['+OTPAdmissionDEArray[5]+categoryFiltersArray[3]+']';
+    var OTPAddFormulaTotalReferredFromIPF='['+OTPAdmissionDEArray[6]+categoryFiltersArray[0]+']+['+OTPAdmissionDEArray[6]+categoryFiltersArray[1]+']+['+OTPAdmissionDEArray[6]+categoryFiltersArray[2]+']+['+OTPAdmissionDEArray[6]+categoryFiltersArray[3]+']';
+    var OTPAddFormulaTotalReferredFromAnotherOTP='['+OTPAdmissionDEArray[7]+categoryFiltersArray[0]+']+['+OTPAdmissionDEArray[7]+categoryFiltersArray[1]+']+['+OTPAdmissionDEArray[7]+categoryFiltersArray[2]+']+['+OTPAdmissionDEArray[7]+categoryFiltersArray[3]+']';
+    var OTPAddFormulaTotalOther='['+OTPAdmissionDEArray[8]+categoryFiltersArray[0]+']+['+OTPAdmissionDEArray[8]+categoryFiltersArray[1]+']+['+OTPAdmissionDEArray[8]+categoryFiltersArray[2]+']+['+OTPAdmissionDEArray[8]+categoryFiltersArray[3]+']';
+
+    var OTPOutFormulaTotalDischargedAsRecovered='['+OTPOutcomeDEArray[0]+categoryFiltersArray[0]+']+['+OTPOutcomeDEArray[0]+categoryFiltersArray[1]+']+['+OTPOutcomeDEArray[0]+categoryFiltersArray[2]+']+['+OTPOutcomeDEArray[0]+categoryFiltersArray[3]+']';
+    var OTPOutFormulaTotalDischargedAsDeath='['+OTPOutcomeDEArray[1]+categoryFiltersArray[0]+']+['+OTPOutcomeDEArray[1]+categoryFiltersArray[1]+']+['+OTPOutcomeDEArray[1]+categoryFiltersArray[2]+']+['+OTPOutcomeDEArray[1]+categoryFiltersArray[3]+']';
+    var OTPOutFormulaTotalDischargedAsDeafulter='['+OTPOutcomeDEArray[2]+categoryFiltersArray[0]+']+['+OTPOutcomeDEArray[2]+categoryFiltersArray[1]+']+['+OTPOutcomeDEArray[2]+categoryFiltersArray[2]+']+['+OTPOutcomeDEArray[2]+categoryFiltersArray[3]+']';
+    var OTPOutFormulaTotalReferredToIPF='['+OTPOutcomeDEArray[3]+categoryFiltersArray[0]+']+['+OTPOutcomeDEArray[3]+categoryFiltersArray[1]+']+['+OTPOutcomeDEArray[3]+categoryFiltersArray[2]+']+['+OTPOutcomeDEArray[3]+categoryFiltersArray[3]+']';
+    var OTPOutFormulaTotalReferredToOtherOTP='['+OTPOutcomeDEArray[4]+categoryFiltersArray[0]+']+['+OTPOutcomeDEArray[4]+categoryFiltersArray[1]+']+['+OTPOutcomeDEArray[4]+categoryFiltersArray[2]+']+['+OTPOutcomeDEArray[4]+categoryFiltersArray[3]+']';
+    var OTPOutFormulaTotalMedicalReferral='['+OTPOutcomeDEArray[5]+categoryFiltersArray[0]+']+['+OTPOutcomeDEArray[5]+categoryFiltersArray[1]+']+['+OTPOutcomeDEArray[5]+categoryFiltersArray[2]+']+['+OTPOutcomeDEArray[5]+categoryFiltersArray[3]+']';
+    var OTPOutFormulaTotalNonResponse='['+OTPOutcomeDEArray[6]+categoryFiltersArray[0]+']+['+OTPOutcomeDEArray[6]+categoryFiltersArray[1]+']+['+OTPOutcomeDEArray[6]+categoryFiltersArray[2]+']+['+OTPOutcomeDEArray[6]+categoryFiltersArray[3]+']';
+    var OTPOutFormulaTotalOther='['+OTPOutcomeDEArray[7]+categoryFiltersArray[0]+']+['+OTPOutcomeDEArray[7]+categoryFiltersArray[1]+']+['+OTPOutcomeDEArray[7]+categoryFiltersArray[2]+']+['+OTPOutcomeDEArray[7]+categoryFiltersArray[3]+']';
+
+    var OTPFormulaTotalDischarged=OTPOutFormulaTotalDischargedAsRecovered+'+'+OTPOutFormulaTotalDischargedAsDeath+'+'+OTPOutFormulaTotalDischargedAsDeafulter+'+'+OTPOutFormulaTotalMedicalReferral+'+'+OTPOutFormulaTotalNonResponse;
+    var OTPFormulaTotalAdmission=OTPAddFormulaTotalNewAdmissionMUAC+'+'+OTPAddFormulaTotalNewAdmissionWH+'+'+OTPAddFormulaTotalNewAdmissionBilateral+'+'+OTPAddFormulaTotalRelapse+'+'+OTPAddFormulaTotalReadmission+'+'+OTPAddFormulaTotalReferredFromSFP;
+
+    getMappedFormulaValuePercentage(analyticsURL, '('+OTPAddFormulaTotalRelapse+')/('+OTPFormulaTotalAdmission+')','#OTPReplape');
+    getMappedFormulaValuePercentage(analyticsURL, '('+OTPAddFormulaTotalReadmission+')/('+OTPFormulaTotalAdmission+')','#OTPReadmission');
+    getMappedFormulaValuePercentage(analyticsURL, '('+OTPOutFormulaTotalReferredToIPF+')/('+OTPFormulaTotalDischarged+')','#OTPcases');
+
+
+    //SFP Report Indiacators Mapping
+    var SFPAdmissionDEArray = new Array(7);
+    SFPAdmissionDEArray[0]='&dimension=dx:kphoyCBcIWl';  //New Admission_MUAC >= 115
+    SFPAdmissionDEArray[1]='&dimension=dx:GM9LauUJCKg';  //New Admission_W/H >= -3
+    SFPAdmissionDEArray[2]='&dimension=dx:iCYYhMWgr8J';  //Relapese
+    SFPAdmissionDEArray[3]='&dimension=dx:nfqfqPOeWvk';  //Re-admission
+    SFPAdmissionDEArray[4]='&dimension=dx:bQqKVpjQnnx';  //Referred from_Another SFP
+    SFPAdmissionDEArray[5]='&dimension=dx:HUghHu97W5z';  //Referred from_IPF
+    SFPAdmissionDEArray[6]='&dimension=dx:ddmD4bvAByO';  //Other
+
+    var SFPOutcomeDEArray=new Array(8);
+    SFPOutcomeDEArray[0]='&dimension=dx:IeIT2bqlMwn';    //Discharged as_Recovered
+    SFPOutcomeDEArray[1]='&dimension=dx:dYOKy1QBBLr';    //Discharged as_Death
+    SFPOutcomeDEArray[2]='&dimension=dx:yfqCNNIQEd3';    //Discharged as_Deafulter
+    SFPOutcomeDEArray[3]='&dimension=dx:b4cw9pIhsKM';    //Referred to_OTP
+    SFPOutcomeDEArray[4]='&dimension=dx:NVBfyjb5D8T';    //Referred to_Another SFP or IPF
+    SFPOutcomeDEArray[5]='&dimension=dx:LUkTBTrs5ci';    //Medical Referral
+    SFPOutcomeDEArray[6]='&dimension=dx:IC3H48KUsvT';    //Non-Response
+    SFPOutcomeDEArray[7]='&dimension=dx:ulCdgYfBIQB';    //Other
+
+    var SFPAddFormulaTotalNewAdmissionMUAC='['+SFPAdmissionDEArray[0]+categoryFiltersArray[0]+']+['+SFPAdmissionDEArray[0]+categoryFiltersArray[1]+']+['+SFPAdmissionDEArray[0]+categoryFiltersArray[2]+']+['+SFPAdmissionDEArray[0]+categoryFiltersArray[3]+']';
+    var SFPAddFormulaTotalNewAdmissionWH='['+SFPAdmissionDEArray[1]+categoryFiltersArray[0]+']+['+SFPAdmissionDEArray[1]+categoryFiltersArray[1]+']+['+SFPAdmissionDEArray[1]+categoryFiltersArray[2]+']+['+SFPAdmissionDEArray[1]+categoryFiltersArray[3]+']';
+    var SFPAddFormulaTotalRelapse='['+SFPAdmissionDEArray[2]+categoryFiltersArray[0]+']+['+SFPAdmissionDEArray[2]+categoryFiltersArray[1]+']+['+SFPAdmissionDEArray[2]+categoryFiltersArray[2]+']+['+SFPAdmissionDEArray[2]+categoryFiltersArray[3]+']';
+    var SFPAddFormulaTotalReadmission='['+SFPAdmissionDEArray[3]+categoryFiltersArray[0]+']+['+SFPAdmissionDEArray[3]+categoryFiltersArray[1]+']+['+SFPAdmissionDEArray[3]+categoryFiltersArray[2]+']+['+SFPAdmissionDEArray[3]+categoryFiltersArray[3]+']';
+    var SFPAddFormulaTotalReferredFromAnotherSFP='['+SFPAdmissionDEArray[4]+categoryFiltersArray[0]+']+['+SFPAdmissionDEArray[4]+categoryFiltersArray[1]+']+['+SFPAdmissionDEArray[4]+categoryFiltersArray[2]+']+['+SFPAdmissionDEArray[4]+categoryFiltersArray[3]+']';
+    var SFPAddFormulaTotalReferredFromIPF='['+SFPAdmissionDEArray[5]+categoryFiltersArray[0]+']+['+SFPAdmissionDEArray[5]+categoryFiltersArray[1]+']+['+SFPAdmissionDEArray[5]+categoryFiltersArray[2]+']+['+SFPAdmissionDEArray[5]+categoryFiltersArray[3]+']';
+    var SFPAddFormulaTotalOther='['+SFPAdmissionDEArray[6]+categoryFiltersArray[0]+']+['+SFPAdmissionDEArray[6]+categoryFiltersArray[1]+']+['+SFPAdmissionDEArray[6]+categoryFiltersArray[2]+']+['+SFPAdmissionDEArray[6]+categoryFiltersArray[3]+']';
+
+    var SFPOutFormulaTotalDischargedAsRecovered='['+SFPOutcomeDEArray[0]+categoryFiltersArray[0]+']+['+SFPOutcomeDEArray[0]+categoryFiltersArray[1]+']+['+SFPOutcomeDEArray[0]+categoryFiltersArray[2]+']+['+SFPOutcomeDEArray[0]+categoryFiltersArray[3]+']';
+    var SFPOutFormulaTotalDischargedAsDeath='['+SFPOutcomeDEArray[1]+categoryFiltersArray[0]+']+['+SFPOutcomeDEArray[1]+categoryFiltersArray[1]+']+['+SFPOutcomeDEArray[1]+categoryFiltersArray[2]+']+['+SFPOutcomeDEArray[1]+categoryFiltersArray[3]+']';
+    var SFPOutFormulaTotalDischargedAsDeafulter='['+SFPOutcomeDEArray[2]+categoryFiltersArray[0]+']+['+SFPOutcomeDEArray[2]+categoryFiltersArray[1]+']+['+SFPOutcomeDEArray[2]+categoryFiltersArray[2]+']+['+SFPOutcomeDEArray[2]+categoryFiltersArray[3]+']';
+    var SFPOutFormulaTotalReferredToOTPIPF='['+SFPOutcomeDEArray[3]+categoryFiltersArray[0]+']+['+SFPOutcomeDEArray[3]+categoryFiltersArray[1]+']+['+SFPOutcomeDEArray[3]+categoryFiltersArray[2]+']+['+SFPOutcomeDEArray[3]+categoryFiltersArray[3]+']';
+    var SFPOutFormulaTotalReferredToAnotherSFP='['+SFPOutcomeDEArray[4]+categoryFiltersArray[0]+']+['+SFPOutcomeDEArray[4]+categoryFiltersArray[1]+']+['+SFPOutcomeDEArray[4]+categoryFiltersArray[2]+']+['+SFPOutcomeDEArray[4]+categoryFiltersArray[3]+']';
+    var SFPOutFormulaTotalMedicalReferral='['+SFPOutcomeDEArray[5]+categoryFiltersArray[0]+']+['+SFPOutcomeDEArray[5]+categoryFiltersArray[1]+']+['+SFPOutcomeDEArray[5]+categoryFiltersArray[2]+']+['+SFPOutcomeDEArray[5]+categoryFiltersArray[3]+']';
+    var SFPOutFormulaTotalNonResponse='['+SFPOutcomeDEArray[6]+categoryFiltersArray[0]+']+['+SFPOutcomeDEArray[6]+categoryFiltersArray[1]+']+['+SFPOutcomeDEArray[6]+categoryFiltersArray[2]+']+['+SFPOutcomeDEArray[6]+categoryFiltersArray[3]+']';
+    var SFPOutFormulaTotalOther='['+SFPOutcomeDEArray[7]+categoryFiltersArray[0]+']+['+SFPOutcomeDEArray[7]+categoryFiltersArray[1]+']+['+SFPOutcomeDEArray[7]+categoryFiltersArray[2]+']+['+SFPOutcomeDEArray[7]+categoryFiltersArray[3]+']';
+
+    var SFPFormulaTotalDischarged=SFPOutFormulaTotalDischargedAsRecovered+'+'+SFPOutFormulaTotalDischargedAsDeath+'+'+SFPOutFormulaTotalDischargedAsDeafulter+'+'+SFPOutFormulaTotalReferredToOTPIPF+'+'+SFPOutFormulaTotalMedicalReferral+'+'+SFPOutFormulaTotalNonResponse;
+    var SFPFormulaTotalAdmission=SFPAddFormulaTotalNewAdmissionMUAC+'+'+SFPAddFormulaTotalNewAdmissionWH+'+'+SFPAddFormulaTotalRelapse+'+'+SFPAddFormulaTotalReadmission+'+'+SFPAddFormulaTotalReferredFromIPF;
+
+    getMappedFormulaValuePercentage(analyticsURL, '('+SFPAddFormulaTotalRelapse+')/('+SFPFormulaTotalAdmission+')','#SFPRelapse');
+    getMappedFormulaValuePercentage(analyticsURL, '('+SFPAddFormulaTotalReadmission+')/('+SFPFormulaTotalAdmission+')','#SFPReadmission');
+
+    if (donorCode != "") {
+        $('#reportTags').append('<div class="row"><label>Donor: ' + donorName + '</label></div>');
+        analyticsURL = analyticsURL.concat('&filter=Q3QQy1PWrqe:' + donorCode);
+    }
+
+    getMappedFormulaValue(analyticsURL,'&dimension=dx:jR58Wc4M6Gp','#OutreachTotal');
+    getMappedFormulaValuePercentage(analyticsURL,'([&dimension=dx:FFy5cI52yZa]+[&dimension=dx:EDG09YqP29p]+[&dimension=dx:YQDR8auRssE])/[&dimension=dx:jR58Wc4M6Gp]' ,'#OutreachMalnutrition');
+
+    reportNotNull=returnReportStatus();
+}
+
+$(document).ready(function () {
+    reportNotNull=false;
+    document.getElementById('noValues').style.display='none';
+    document.getElementById('reportInside').style.display='none';
+    document.getElementById('head').style.display='block';
+
+    reportLogic();
+    $("#btnExport").click(function (e) {
+        tableToExcel('tableContainer', 'CMAM-Indicator Report');
+        e.preventDefault();
+    });
+    $("#btnBack").click(function (e) {
+        reportNotNull=false;
+        window.history.go(-1);
+    });
+    $("#btnBack2").click(function (e) {
+        reportNotNull=false;
+        window.history.go(-1);
+    });
+    $("#btnHome").click(function (e) {
+        var hrefURL=dhisBaseURL.substring(0,dhisBaseURL.length-3);
+        window.location.href = hrefURL+'dhis-web-dashboard-integration/index.action';
+    });
+    $("#btnPrint").click(function (e) {
+        var headstr = "<html><head><title></title></head><body>";
+        var footstr = "</body>";
+        var reportName=document.getElementById('reportName').innerHTML;
+        var newstr = document.all.item('tableContainer').innerHTML;
+        var oldstr = document.body.innerHTML;
+        document.body.innerHTML = headstr+reportName+newstr+footstr;
+        window.print();
+        document.body.innerHTML = oldstr;
+    });
+    if(reportNotNull){
+        document.getElementById('head').style.display='none';
+        document.getElementById('reportInside').style.display='block';
+    }
+    else{
+        document.getElementById('head').style.display='none';
+        document.getElementById('noValues').style.display='block';
+    }
+});
+
+
+
+</script>
+
+
+
+</head>
+<body id="pageBody">
+<div id="navigation" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+                    <span>
+                        <a class="navbar-brand" href="#">
+                            <img src="assets/img/news.png" width="35px" height="35px">
+                            &NonBreakingSpace;
+                            <b>[Custom-Reports]</b>
+                        </a>
+                        <label>
+                            <span class="navbar-fixed-top" id="btnHome" style="padding-left:90%; padding-top: 20px">
+                                <div class="label btn-primary">&nbsp;&nbsp;Home&nbsp;&nbsp;</div>
+                            </span>
+                        </label>
+                    </span>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav"></ul>
+        </div>
+    </div>
+</div>
+<div class="container" id="head" style="padding-top: 20%">
+    <div style="margin:auto;text-align: center">Report is Loading...</div>
+    <div class="progress progress-striped active" id="cover">
+        <div class="progress-bar progress-bar-info"
+             role="progressbar"
+             aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
+             style="width: 100%;">
+        </div>
+    </div>
+</div>
+<div class="container" id="page" style="padding-top: 60px">
+
+    <div class="container" id="reportInside">
+        <div class="row">
+            <div class="col-md-8" id="reportName">
+                <label><span class="label label-primary">CMAM-Indicator Report</span></label>
+            </div>
+            <div class="col-md-2">
+                <div style="float: left"><label><span class="label btn-success" id="btnBack">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+            </div>
+            <div class="col-md-1">
+                <div style="float: right"><label><span class="label btn-success" id="btnExport">&nbsp;Export to Excel&nbsp;</span></label></div>
+            </div>
+            <div class="col-md-1">
+                <div style="float: left"><label><span class="label btn-success" id="btnPrint">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+            </div>
+        </div>
+
+
+        <div class="container">
+            <div class="col-md-12" id="tableContainer" style="padding-top: 20px">
+                <div class="col-md-6"  id="reportTags"></div>
+                <div class="col-md-6"></div>
+                <table class="bordered" id="reportTable">
+                    <tr>
+                        <th colspan="3">OTP</th>
+                        <th colspan="2">SFP</th>
+                        <th colspan="3">Outreach activities</th>
+
+                    </tr>
+                    <tr>
+                        <th>% Relapse</th>
+                        <th>% Re-admission</th>
+                        <th>% OTP cases requiring inpatient care</th>
+                        <th>% Relapse</th>
+                        <th>% Re-admission</th>
+                        <th>Total screened</th>
+                        <th>% of malnutrition</th>
+
+                    </tr>
+                    <tr>
+                        <td id="OTPReplape"></td>
+                        <td id="OTPReadmission"></td>
+                        <td id="OTPcases"></td>
+                        <td id="SFPRelapse"></td>
+                        <td id="SFPReadmission"></td>
+                        <td id="OutreachTotal"></td>
+                        <td id="OutreachMalnutrition"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="noValues" style="padding-top: 5%">
+<div class="row">
+    <div class="col-md-5"></div>
+    <div class="col-md-2"> <img src="assets/img/noValues.png"> </div>
+    <div class="col-md-5"></div>
+</div>
+<h1 style="text-align: center">No values found. Please change report parameters.</h1><br>
+<div class="row">
+    <div class="col-md-5"></div>
+    <div class="col-md-2">
+        <div style="float: left"><label><span class="label btn-success" id="btnBack2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Back&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></label></div>
+    </div>
+    <div class="col-md-5"></div>
+</div>
+</div>
+
+
+</body>
+</html>
